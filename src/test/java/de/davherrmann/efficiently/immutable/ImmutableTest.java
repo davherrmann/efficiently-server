@@ -11,6 +11,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -184,6 +185,17 @@ public class ImmutableTest
 
         // then
         assertThat(immutable.values().isEmpty(), is(true));
+    }
+
+    @Test
+    public void setIn_canHandleMaps() throws Exception
+    {
+        // given / when
+        final Immutable<POJO> newImmutable = immutable.in(path.myMap()).set(
+            ImmutableMap.<String, String>builder().put("My", "Map").build());
+
+        // then
+        assertThat(newImmutable.asObject().myMap().get("My"), is("Map"));
     }
 
     private interface POJO

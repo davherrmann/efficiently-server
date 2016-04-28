@@ -146,7 +146,7 @@ public class Immutable<I>
             final Object returnValue = value == null
                 ? Defaults.defaultValue(returnType)
                 : value;
-            final boolean isCastable = returnValue == null || isAssignable(returnType, returnValue.getClass());
+            final boolean isCastable = returnValue == null || isAssignable(returnValue.getClass(), returnType);
 
             return isCastable
                 ? returnValue
