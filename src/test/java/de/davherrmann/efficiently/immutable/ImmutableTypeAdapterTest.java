@@ -3,52 +3,42 @@ package de.davherrmann.efficiently.immutable;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Map;
 
 import org.junit.Test;
 
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import com.google.gson.Gson;
 
 public class ImmutableTypeAdapterTest
 {
     private final Immutable<POJO> immutable = new Immutable<>(POJO.class);
     private final POJO path = immutable.path();
-
-    private final ImmutableTypeAdapter typeAdapter = new ImmutableTypeAdapter();
-    private final StringWriter out = new StringWriter();
-    private final JsonWriter jsonWriter = new JsonWriter(out);
+    private final Gson gson = new Gson();
 
     @Test
     public void write_withEmptyImmutable_writesEmptyObject() throws Exception
     {
-        // when
-        write(immutable);
-
-        // then
-        assertThat(out.toString(), is("{}"));
+        // when / then
+        assertThat(gson.toJson(immutable), is("{}"));
     }
     @Test
     public void write_setInCustomType_works() throws Exception
     {
         // when
-        write(immutable.in(path.name().firstname()).set("Foo"));
+        final Immutable<POJO> newImmutable = immutable.in(path.name().firstname()).set("Foo");
 
         // then
-        assertThat(out.toString(), is("{\"name\":{\"firstname\":\"Foo\"}}"));
+        assertThat(gson.toJson(newImmutable), is("{\"name\":{\"firstname\":\"Foo\"}}"));
     }
 
     @Test
     public void write_overwriteCustomType_works() throws Exception
     {
         // when
-        write(immutable.in(path.name()).set(name("Foo", "Bar")));
+        final Immutable<POJO> newImmutable = immutable.in(path.name()).set(name("Foo", "Bar"));
 
         // then
-        assertThat(out.toString(), is("{\"name\":{\"firstname\":\"Foo\",\"lastname\":\"Bar\"}}"));
+        assertThat(gson.toJson(newImmutable), is("{\"name\":{\"firstname\":\"Foo\",\"lastname\":\"Bar\"}}"));
     }
 
     private Immutable<POJO.Name> name(String firstname, String lastname)
@@ -59,11 +49,6 @@ public class ImmutableTypeAdapterTest
         return immutable //
             .in(path.firstname()).set(firstname) //
             .in(path.lastname()).set(lastname);
-    }
-
-    private void write(Immutable<POJO> immutable) throws IOException
-    {
-        typeAdapter.write(jsonWriter, immutable);
     }
 
     private interface POJO
@@ -87,21 +72,6 @@ public class ImmutableTypeAdapterTest
             String firstname();
 
             String lastname();
-        }
-    }
-
-    private static class NameTypeAdapter extends TypeAdapter<POJO.Name>
-    {
-        @Override
-        public void write(JsonWriter out, POJO.Name value) throws IOException
-        {
-            throw new RuntimeException("called...");
-        }
-
-        @Override
-        public POJO.Name read(JsonReader in) throws IOException
-        {
-            return null;
         }
     }
 }
