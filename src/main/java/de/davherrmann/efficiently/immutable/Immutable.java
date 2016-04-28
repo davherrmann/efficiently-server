@@ -14,6 +14,7 @@ import java.util.function.Function;
 import com.google.common.base.Defaults;
 import com.google.common.collect.ImmutableMap;
 
+@com.google.gson.annotations.JsonAdapter(ImmutableTypeAdapter.class)
 public class Immutable<I>
 {
     private final Class<I> type;
@@ -79,7 +80,12 @@ public class Immutable<I>
 
         public Immutable<I> set(T value)
         {
-            return new Immutable<>(type, nextImmutable.setIn(values, path, value), pathRecorder);
+            return new Immutable<>(type, nextImmutable.setIn(values, path, immutableNodeOr(value)), pathRecorder);
+        }
+
+        public Immutable<I> set(Immutable<T> immutableValue)
+        {
+            return set(immutableValue.asObject());
         }
 
         @SuppressWarnings("unchecked")
@@ -94,6 +100,12 @@ public class Immutable<I>
                         ? defaultValue
                         : value))),  //
                 pathRecorder);
+        }
+        private Object immutableNodeOr(T value)
+        {
+            return value instanceof ImmutableNode
+                ? ((ImmutableNode) value).values()
+                : value;
         }
     }
 
@@ -124,7 +136,7 @@ public class Immutable<I>
     {
         return (T) Proxy.newProxyInstance( //
             type.getClassLoader(), //
-            new Class[]{type}, //
+            new Class[]{type, ImmutableNode.class}, //
             new ImmutableObjectInvocationHandler(nestedPath) //
         );
     }
@@ -139,6 +151,13 @@ public class Immutable<I>
         @Override
         protected Object handleInvocation(List<String> path, Method method) throws Throwable
         {
+            if (method.getName().equals("values"))
+            {
+                return path.isEmpty()
+                    ? values
+                    : nextImmutable.getInPath(values, path);
+            }
+
             final List<String> pathWithMethod = pathWith(method);
             final Class<?> returnType = method.getReturnType();
 
@@ -152,5 +171,10 @@ public class Immutable<I>
                 ? returnValue
                 : immutableFor(returnType, pathWithMethod);
         }
+    }
+
+    private interface ImmutableNode
+    {
+        Map<String, Object> values();
     }
 }

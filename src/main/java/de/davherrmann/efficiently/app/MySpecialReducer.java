@@ -47,7 +47,7 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
         return state;
     }
 
-    private MySpecialState.Item[] persons()
+    static MySpecialState.Item[] persons()
     {
         return new MySpecialState.Item[]{
             person("hilla", "sakala", "https://randomuser.me/api/portraits/thumb/women/32.jpg",
@@ -86,7 +86,7 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
                 "ayşe.tuğlu@example.com")};
     }
 
-    private MySpecialState.Item person(String firstName, String lastName, String thumbnail, String email)
+    static MySpecialState.Item person(String firstName, String lastName, String thumbnail, String email)
     {
         return new MySpecialState.Item()
         {

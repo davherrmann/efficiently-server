@@ -11,10 +11,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 public class ImmutableTest
 {
     @Rule
@@ -121,26 +117,6 @@ public class ImmutableTest
     }
 
     @Test
-    public void gsonCompatibility() throws Exception
-    {
-        // given
-        final Immutable<POJO> newImmutable = immutable  //
-            .in(path.wantToClose()).set(true) //
-            .in(path.currentPage()).set(2) //
-            .in(path.pojo().title()).set("Foo") //
-            .in(path.pojo().pojo().currentPage()).set(9) //
-            .in(path.pojo().pojo().pojo().title()).set("Bar");
-
-        final Gson gson = new GsonBuilder() //
-            .registerTypeAdapter(Immutable.class, new ImmutableJsonSerializer()) //
-            .create();
-
-        // when / then
-        assertThat(gson.toJson(newImmutable),
-            is("{\"pojo\":{\"pojo\":{\"pojo\":{\"title\":\"Bar\"},\"currentPage\":9},\"title\":\"Foo\"},\"wantToClose\":true,\"currentPage\":2}"));
-    }
-
-    @Test
     public void equals_returnsTrue_forEqualImmutables() throws Exception
     {
         // given / then
@@ -188,14 +164,39 @@ public class ImmutableTest
     }
 
     @Test
-    public void setIn_canHandleMaps() throws Exception
+    public void setIn_overwriteCustomType() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path.myMap()).set(
-            ImmutableMap.<String, String>builder().put("My", "Map").build());
+        final Immutable<POJO> newImmutable = immutable //
+            .in(path.name().firstname()).set("Foo") //
+            .in(path.name().lastname()).set("Bar") //
+            .in(path.name()).set(name("F", "B").asObject());
 
         // then
-        assertThat(newImmutable.asObject().myMap().get("My"), is("Map"));
+        assertThat(newImmutable.asObject().name().firstname(), is("F"));
+        assertThat(newImmutable.asObject().name().lastname(), is("B"));
+    }
+
+    @Test
+    public void setIn_inCustomTypeObject() throws Exception
+    {
+        // given / when
+        final Immutable<POJO> newImmutable = immutable  //
+            .in(path.name()).set(name("F", "B").asObject()) //
+            .in(path.name().firstname()).set("Foo");
+
+        // then
+        assertThat(newImmutable.asObject().name().firstname(), is("Foo"));
+        assertThat(newImmutable.asObject().name().lastname(), is("B"));
+    }
+
+    private Immutable<POJO.Name> name(String firstname, String lastname)
+    {
+        final Immutable<POJO.Name> immutable = new Immutable<>(POJO.Name.class);
+        final POJO.Name path = immutable.path();
+        return immutable //
+            .in(path.firstname()).set(firstname) //
+            .in(path.lastname()).set(lastname);
     }
 
     private interface POJO
@@ -209,5 +210,16 @@ public class ImmutableTest
         Map<String, String> myMap();
 
         POJO pojo();
+
+        Name[] names();
+
+        Name name();
+
+        interface Name
+        {
+            String firstname();
+
+            String lastname();
+        }
     }
 }
