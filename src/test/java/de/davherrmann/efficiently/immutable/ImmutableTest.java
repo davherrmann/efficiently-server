@@ -176,6 +176,16 @@ public class ImmutableTest
         new Immutable<>(POJO.class).in(path.wantToClose()).set(true);
     }
 
+    @Test
+    public void clear_returnsEmptyState() throws Exception
+    {
+        // when
+        final Immutable<POJO> clearedImmutable = immutable.clear();
+
+        // then
+        assertThat(immutable.values().isEmpty(), is(true));
+    }
+
     private interface POJO
     {
         String title();

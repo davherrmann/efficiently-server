@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import com.google.common.base.Defaults;
+import com.google.common.collect.ImmutableMap;
 
 public class Immutable<I>
 {
@@ -58,6 +59,11 @@ public class Immutable<I>
     public Immutable<I> diff(Immutable<I> immutable)
     {
         return new Immutable<>(type, nextImmutable.diff(values, immutable.values()), pathRecorder);
+    }
+
+    public Immutable<I> clear()
+    {
+        return new Immutable<>(type, ImmutableMap.of(), pathRecorder);
     }
 
     public class In<T>
