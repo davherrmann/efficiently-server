@@ -2,12 +2,8 @@ package de.davherrmann.efficiently.immutable;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Collections.emptyList;
+import static org.springframework.util.ClassUtils.isAssignable;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
@@ -81,13 +77,6 @@ public class Immutable<I>
         }
     }
 
-    @Documented
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface Value
-    {
-    }
-
     Map<String, Object> values()
     {
         return values;
@@ -120,10 +109,11 @@ public class Immutable<I>
             final Object returnValue = value == null
                 ? Defaults.defaultValue(returnType)
                 : value;
+            final boolean isCastable = returnValue == null || isAssignable(returnType, returnValue.getClass());
 
-            return returnValue != null && method.isAnnotationPresent(Value.class)
-                ? immutableFor(returnType, pathWithMethod)
-                : returnValue;
+            return isCastable
+                ? returnValue
+                : immutableFor(returnType, pathWithMethod);
         }
     }
 }

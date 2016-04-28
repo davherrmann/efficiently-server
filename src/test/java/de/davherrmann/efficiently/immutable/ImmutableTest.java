@@ -114,7 +114,6 @@ public class ImmutableTest
         assertThat(newImmutable.asObject().pojo().wantToClose(), is(true));
     }
 
-
     @Test
     public void gsonCompatibility() throws Exception
     {
@@ -145,7 +144,6 @@ public class ImmutableTest
 
         Map<String, String> myMap();
 
-        @Immutable.Value
         POJO pojo();
     }
 }
