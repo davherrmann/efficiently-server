@@ -5,12 +5,10 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -68,9 +66,6 @@ public class ImmutableTest
     @Test
     public void update_changesBooleanValue() throws Exception
     {
-        // TODO is this necessary? Or should the object only be immutable when returned from asObject()?
-        // TODO -> yes! this is what we need -> service call with immutable as arg, service should not be allowed
-        // TODO to change state!
         // given /  when
         final Immutable<POJO> newImmutable = immutable.in(path.wantToClose()).update(value -> !value);
 
@@ -89,7 +84,7 @@ public class ImmutableTest
     }
 
     @Test
-    public void set_returnsNewImmutable() throws Exception
+    public void set_returnsNewImmutable2() throws Exception
     {
         // given / when
         final Immutable<POJO> newImmutable = immutable.in(path.wantToClose()).set(false);
@@ -99,7 +94,7 @@ public class ImmutableTest
     }
 
     @Test
-    public void set_returnsImmutable_withSamePath() throws Exception
+    public void set_returnsImmutable2_withSamePath() throws Exception
     {
         // given / when
         final Immutable<POJO> newImmutable = immutable.in(path.wantToClose()).set(false);
@@ -119,6 +114,7 @@ public class ImmutableTest
         assertThat(newImmutable.asObject().pojo().wantToClose(), is(true));
     }
 
+
     @Test
     public void gsonCompatibility() throws Exception
     {
@@ -132,55 +128,11 @@ public class ImmutableTest
 
         final Gson gson = new GsonBuilder() //
             .registerTypeAdapter(Immutable.class, new ImmutableJsonSerializer()) //
-            .registerTypeAdapter(ImmutableNode.class, new ImmutableNodeJsonSerializer()) //
             .create();
 
         // when / then
         assertThat(gson.toJson(newImmutable),
-            is("{\"pojo\":{\"pojo\":{\"pojo\":{\"title\":\"Bar\"},\"currentPage\":9},\"title\":\"Foo\"},\"currentPage\":2,\"wantToClose\":true}"));
-    }
-
-    @Test
-    public void immutableDataStructure() throws Exception
-    {
-        // given
-        final Map<String, Object> immutableDataStructure = ImmutableMap.<String, Object>builder() //
-            .put("B", ImmutableMap.<String, Object>builder() //
-                .put("C1", "C1Foo") //
-                .put("C2", "C2Foo") //
-                .put("C3", "C3Foo") //
-                .build()) //
-            .put("D", "EFoo") //
-            .build();
-
-        // when
-        // TODO change content of D to "FFoo"
-        final ImmutableMap<String, Object> immutableDataStructure1 = ImmutableMap.<String, Object>builder() //
-            .put("B", immutableDataStructure.get("B")) //
-            .put("D", "FFoo") //
-            .build();
-
-        // TODO change content of C2 to "C2Bar"
-        final ImmutableMap<String, Object> immutableDataStructure2 = ImmutableMap.<String, Object>builder() //
-            .put("B", ImmutableMap.<String, Object>builder() //
-                .put("C1", ((Map<String, Object>) immutableDataStructure1.get("B")).get("C1")) //
-                .put("C2", "C2Bar") //
-                .put("C3", ((Map<String, Object>) immutableDataStructure1.get("B")).get("C3")) //
-                .build()) //
-            .put("D", immutableDataStructure1.get("D")) //
-            .build();
-
-        // TODO new top level node, copy all other nodes and values -> automate
-        final ImmutableMap<String, Object> immutableDataStructure3 = ImmutableMap.<String, Object>builder() //
-            .put("B", immutableDataStructure2.get("B")) //
-            .put("D", immutableDataStructure2.get("D")) //
-            .build();
-
-        // then
-        System.out.println(Arrays.toString(immutableDataStructure.entrySet().toArray()));
-        System.out.println(Arrays.toString(immutableDataStructure1.entrySet().toArray()));
-        System.out.println(Arrays.toString(immutableDataStructure2.entrySet().toArray()));
-        System.out.println(Arrays.toString(immutableDataStructure3.entrySet().toArray()));
+            is("{\"pojo\":{\"pojo\":{\"pojo\":{\"title\":\"Bar\"},\"currentPage\":9},\"title\":\"Foo\"},\"wantToClose\":true,\"currentPage\":2}"));
     }
 
     private interface POJO
@@ -193,7 +145,7 @@ public class ImmutableTest
 
         Map<String, String> myMap();
 
+        @Immutable.Value
         POJO pojo();
     }
-
 }

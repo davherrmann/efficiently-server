@@ -18,7 +18,7 @@ public class PathRecorderTest
         path.integer();
 
         // then
-        assertThat(pathRecorder.lastCalledMethod().getName(), is("integer"));
+        assertThat(pathRecorder.lastCalledPath(), is(newArrayList("integer")));
     }
 
     @Test
@@ -28,8 +28,7 @@ public class PathRecorderTest
         path.pojo().pojo().integer();
 
         // then
-        assertThat(pathRecorder.lastCalledMethod().getName(), is("integer"));
-        assertThat(pathRecorder.lastCalledNestedPath(), is(newArrayList("pojo", "pojo")));
+        assertThat(pathRecorder.lastCalledPath(), is(newArrayList("pojo", "pojo", "integer")));
     }
 
     private interface POJO

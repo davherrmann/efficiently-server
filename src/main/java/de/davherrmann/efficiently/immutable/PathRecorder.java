@@ -5,18 +5,13 @@ import static java.util.Collections.emptyList;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.collect.Lists;
-import com.google.common.reflect.AbstractInvocationHandler;
 
 public class PathRecorder<I>
 {
     private final I path;
 
-    private Method lastCalledMethod;
-    private List<String> lastCalledNestedPath;
+    private List<String> lastPath;
 
     public PathRecorder(Class<I> type)
     {
@@ -28,14 +23,9 @@ public class PathRecorder<I>
         return path;
     }
 
-    public Method lastCalledMethod()
+    public List<String> lastCalledPath()
     {
-        return lastCalledMethod;
-    }
-
-    public List<String> lastCalledNestedPath()
-    {
-        return lastCalledNestedPath;
+        return lastPath;
     }
 
     @SuppressWarnings("unchecked")
@@ -47,35 +37,27 @@ public class PathRecorder<I>
             new PathInvocationHandler(nestedPath));
     }
 
-    private class PathInvocationHandler extends AbstractInvocationHandler
+    private class PathInvocationHandler extends AbstractPathInvocationHandler
     {
-        private final List<String> nestedPath;
-
         public PathInvocationHandler(final List<String> nestedPath)
         {
-            this.nestedPath = nestedPath;
+            super(nestedPath);
         }
 
         @Override
-        protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable
+        protected Object handleInvocation(List<String> path, Method method) throws Throwable
         {
-            lastCalledMethod = method;
-            lastCalledNestedPath = nestedPath;
+            // TODO concurrency issues?
+            lastPath = pathWith(method);
 
             final Class<?> returnType = method.getReturnType();
             final Object defaultValue = defaultValue(returnType);
 
             return defaultValue != null || !returnType.isInterface()
                 ? defaultValue
-                : pathFor(returnType, nestedPathWith(method));
-        }
-
-        private List<String> nestedPathWith(Method method)
-        {
-            final ArrayList<String> newNestedPath = Lists.newArrayList(nestedPath);
-            newNestedPath.add(method.getName());
-            return newNestedPath;
+                : pathFor(returnType, lastPath);
         }
     }
 
 }
+
