@@ -146,6 +146,60 @@ public class NextImmutableTest
         assertNull(notExisting);
     }
 
+    @Test
+    public void diff_worksWithNonNestedChanges() throws Exception
+    {
+        // given
+        final Map<String, Object> immutableDataStructure1 = nextImmutable.setIn(immutableDataStructure,
+            newArrayList("B"), "BBar");
+        final Map<String, Object> immutableDataStructure2 = nextImmutable.setIn(immutableDataStructure1,
+            newArrayList("A"), "ABar");
+
+        // when
+        final Map<String, Object> diff = nextImmutable.diff(immutableDataStructure, immutableDataStructure2);
+
+        // then
+        assertThat(diff, is(ImmutableMap.builder().put("A", "ABar").put("B", "BBar").build()));
+    }
+
+    @Test
+    public void diff_worksWithNestedChanges() throws Exception
+    {
+        // given
+        final Map<String, Object> newImmutableDataStructure = nextImmutable.setIn(immutableDataStructure,
+            newArrayList("C", "D"), "DBar");
+
+        // when
+        final Map<String, Object> diff = nextImmutable.diff(immutableDataStructure, newImmutableDataStructure);
+
+        // then
+        assertThat(diff, //
+            is(ImmutableMap.builder() //
+                .put("C", ImmutableMap.builder() //
+                    .put("D", "DBar") //
+                    .build()) //
+                .build()));
+    }
+
+    @Test
+    public void diff_worksWithNewNestedPath() throws Exception
+    {
+        // given
+        final Map<String, Object> newImmutableDataStructure = nextImmutable.setIn(immutableDataStructure,
+            newArrayList("S", "T"), "TBar");
+
+        // when
+        final Map<String, Object> diff = nextImmutable.diff(immutableDataStructure, newImmutableDataStructure);
+
+        // then
+        assertThat(diff, //
+            is(ImmutableMap.builder() //
+                .put("S", ImmutableMap.builder() //
+                    .put("T", "TBar") //
+                    .build()) //
+                .build()));
+    }
+
     // TODO do we need this method in NextImmutable?
     private Map<String, Object> change(String key, Object value)
     {

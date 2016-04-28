@@ -2,6 +2,7 @@ package de.davherrmann.efficiently.immutable;
 
 import static java.util.stream.Collectors.toMap;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,23 @@ public class NextImmutable
                     : newValue)));
     }
 
+    public Map<String, Object> diff(Map<String, Object> dataStructure0, Map<String, Object> dataStructure1)
+    {
+        return Stream.of(dataStructure1) //
+            .map(m -> m.entrySet()) //
+            .flatMap(Collection::stream) //
+            .filter(e -> e.getValue() != null && !e.getValue().equals(dataStructure0.get(e.getKey()))) //
+            .map(e -> {
+                final String key = e.getKey();
+                final Object newValue = e.getValue();
+                final Object oldValue = dataStructure0.get(key);
+                return isDataStructure(newValue) && isDataStructure(oldValue)
+                    ? new SimpleEntry<>(key, diff(dataStructure(oldValue), dataStructure(newValue)))
+                    : e;
+            }) //
+            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     private Map<String, Object> changeForSinglePath(final List<String> path, final Object value)
     {
         // TODO test first!
@@ -73,9 +91,8 @@ public class NextImmutable
     {
         return (Map<String, Object>) value;
     }
-
     private boolean isDataStructure(Object value)
     {
-        return Map.class.isAssignableFrom(value.getClass());
+        return value != null && Map.class.isAssignableFrom(value.getClass());
     }
 }
