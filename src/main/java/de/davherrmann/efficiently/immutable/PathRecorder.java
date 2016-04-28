@@ -7,11 +7,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
+import com.google.common.collect.ImmutableList;
+
 public class PathRecorder<I>
 {
     private final I path;
 
-    private List<String> lastPath;
+    private List<String> lastPath = ImmutableList.of();
 
     public PathRecorder(Class<I> type)
     {
@@ -23,9 +27,10 @@ public class PathRecorder<I>
         return path;
     }
 
+    @NotNull
     public List<String> lastCalledPath()
     {
-        return lastPath;
+        return this.lastPath;
     }
 
     @SuppressWarnings("unchecked")

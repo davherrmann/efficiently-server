@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 import com.google.common.base.Defaults;
@@ -44,7 +45,19 @@ public class Immutable<I>
     public <T> In<T> in(T method)
     {
         // TODO can we rely on method as defaultValue?
-        return new In<>(pathRecorder.lastCalledPath(), method);
+        final List<String> path = pathRecorder.lastCalledPath();
+
+        if (path.isEmpty())
+        {
+            throw new IllegalStateException("No path was recorded. Did you use the correct Immutable#path()?");
+        }
+
+        return new In<>(path, method);
+    }
+
+    public Immutable<I> diff(Immutable<I> immutable)
+    {
+        return new Immutable<>(type, nextImmutable.diff(values, immutable.values()), pathRecorder);
     }
 
     public class In<T>
@@ -76,6 +89,23 @@ public class Immutable<I>
                         : value))),  //
                 pathRecorder);
         }
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Immutable<?> immutable = (Immutable<?>) o;
+        return Objects.equals(type, immutable.type) && Objects.equals(values, immutable.values);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(type, values);
     }
 
     Map<String, Object> values()

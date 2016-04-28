@@ -7,13 +7,18 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Map;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class ImmutableTest
 {
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
+
     private final Immutable<POJO> immutable = new Immutable<>(POJO.class);
     private final POJO path = immutable.path();
     private final POJO pojo = immutable.asObject();
@@ -132,6 +137,43 @@ public class ImmutableTest
         // when / then
         assertThat(gson.toJson(newImmutable),
             is("{\"pojo\":{\"pojo\":{\"pojo\":{\"title\":\"Bar\"},\"currentPage\":9},\"title\":\"Foo\"},\"wantToClose\":true,\"currentPage\":2}"));
+    }
+
+    @Test
+    public void equals_returnsTrue_forEqualImmutables() throws Exception
+    {
+        // given / then
+        assertThat(new Immutable<>(POJO.class), is(new Immutable<>(POJO.class)));
+    }
+
+    @Test
+    public void diff_returnsChanges() throws Exception
+    {
+        // given
+        final Immutable<POJO> newImmutable = immutable.in(path.pojo().wantToClose()).set(true);
+
+        // TODO should you be able to pass a PathRecorder into constructor?
+        // TODO -> one "unnecessary" variable: initialDiffImmutable
+        final Immutable<POJO> initialDiffImmutable = new Immutable<>(POJO.class);
+        final POJO diffPath = initialDiffImmutable.path();
+        final Immutable<POJO> diffImmutable = initialDiffImmutable.in(diffPath.pojo().wantToClose()).set(true);
+
+        // when
+        final Immutable<POJO> diff = immutable.diff(newImmutable);
+
+        // then
+        assertThat(diff, is(diffImmutable));
+    }
+
+    @Test
+    public void changeWithOwnUnusedPath_usingWrongPath_throwsMeaningfulException() throws Exception
+    {
+        // then
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage("No path was recorded. Did you use the correct Immutable#path()?");
+
+        // when
+        new Immutable<>(POJO.class).in(path.wantToClose()).set(true);
     }
 
     private interface POJO
