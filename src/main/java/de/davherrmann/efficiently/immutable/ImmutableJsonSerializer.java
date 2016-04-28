@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-class ImmutableJsonSerializer implements JsonSerializer<Immutable>
+public class ImmutableJsonSerializer implements JsonSerializer<Immutable>
 {
     @Override
     public JsonElement serialize(Immutable src, Type typeOfSrc, JsonSerializationContext context)

@@ -1,58 +1,57 @@
 package de.davherrmann.efficiently.app;
 
+import de.davherrmann.efficiently.immutable.Immutable;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 
-public class MySpecialReducer implements Reducer<ImmutableMySpecialState>
+public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
 {
     @Override
-    public ImmutableMySpecialState reduce(ImmutableMySpecialState state, Action action)
+    public Immutable<MySpecialState> reduce(Immutable<MySpecialState> state, Action action)
     {
+        final MySpecialState path = state.path();
+
         switch (action.type())
         {
             case "initState":
-                return ImmutableMySpecialState.builder() //
-                    .ewb(ImmutableEWB.builder() //
-                        .actions("print", "close", "save") //
-                        .title("MyEWB") //
-                        .build()) //
-                    .assistant(ImmutableAssistant.builder() //
-                        .actions("print", "close", "save") //
-                        .title("MyAssistant") //
-                        .currentPage(2) //
-                        .build()) //
-                    .wantToClose(false) //
-                    .items(persons()) //
-                    .build();
+                return state.clear() //
+                    .in(path.ewb().actions()).set(new String[]{"print", "close", "save"}) //
+                    .in(path.ewb().title()).set("MyEWB") //
+
+                    .in(path.assistant().actions()).set(new String[]{"print", "close", "save"}) //
+                    .in(path.assistant().title()).set("MyAssistant") //
+                    .in(path.assistant().currentPage()).set(2) //
+
+                    .in(path.wantToClose()).set(false) //
+                    .in(path.items()).set(persons());
 
             case "assistantAction":
-                final ImmutableAssistant assistant = state.assistant();
                 if (action.actionId().equals("previous"))
-                    return state.withAssistant(assistant.withCurrentPage(assistant.currentPage() - 1));
+                    return state.in(path.assistant().currentPage()).update(page -> page - 1);
                 if (action.actionId().equals("next"))
-                    return state.withAssistant(assistant.withCurrentPage(assistant.currentPage() + 1));
+                    return state.in(path.assistant().currentPage()).update(page -> page + 1);
                 if (action.actionId().equals("print"))
-                    return state.withAssistant(assistant.withTitle(assistant.title() + "!"));
+                    return state.in(path.assistant().title()).update(title -> title + "!");
                 if (action.actionId().equals("save"))
-                    return state.withAssistant(assistant.withActions("print", "close"));
+                    return state.in(path.assistant().actions()).set(new String[]{"print", "close"});
                 if (action.actionId().equals("close"))
-                    return state.withWantToClose(true);
+                    return state.in(path.wantToClose()).set(true);
                 break;
 
             case "dialogAction":
                 if (action.actionId().equals("reallyClose"))
-                    return state.withWantToClose(false);
-
+                    return state.in(path.wantToClose()).set(false);
 
         }
 
         return state;
     }
 
-    private ImmutableItem[] persons()
+    private MySpecialState.Item[] persons()
     {
-        return new ImmutableItem[]{person("hilla", "sakala", "https://randomuser.me/api/portraits/thumb/women/32.jpg",
-            "hilla.sakala@example.com"),
+        return new MySpecialState.Item[]{
+            person("hilla", "sakala", "https://randomuser.me/api/portraits/thumb/women/32.jpg",
+                "hilla.sakala@example.com"),
             person("samuel", "mitchell", "https://randomuser.me/api/portraits/thumb/men/2.jpg",
                 "samuel.mitchell@example.com"),
             person("helmi", "ranta", "https://randomuser.me/api/portraits/thumb/women/18.jpg",
@@ -87,14 +86,39 @@ public class MySpecialReducer implements Reducer<ImmutableMySpecialState>
                 "ayşe.tuğlu@example.com")};
     }
 
-    private ImmutableItem person(String firstName, String lastName, String thumbnail, String email)
+    private MySpecialState.Item person(String firstName, String lastName, String thumbnail, String email)
     {
-        return ImmutableItem.builder() //
-            .additional(Double.toString(Math.random())) //
-            .firstname(firstName) //
-            .lastname(lastName) //
-            .thumbnail(thumbnail) //
-            .email(email) //
-            .build();
+        return new MySpecialState.Item()
+        {
+            @Override
+            public String firstname()
+            {
+                return firstName;
+            }
+
+            @Override
+            public String lastname()
+            {
+                return lastName;
+            }
+
+            @Override
+            public String thumbnail()
+            {
+                return thumbnail;
+            }
+
+            @Override
+            public String email()
+            {
+                return email;
+            }
+
+            @Override
+            public String additional()
+            {
+                return "asdf";
+            }
+        };
     }
 }

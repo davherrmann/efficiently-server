@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-import de.davherrmann.efficiently.app.ImmutableMySpecialState;
 import de.davherrmann.efficiently.app.MySpecialReducer;
+import de.davherrmann.efficiently.app.MySpecialState;
+import de.davherrmann.efficiently.immutable.Immutable;
+import de.davherrmann.efficiently.immutable.ImmutableJsonSerializer;
 
 @RestController
 @ComponentScan
@@ -20,11 +23,13 @@ import de.davherrmann.efficiently.app.MySpecialReducer;
 public class EfficientlyServer
 {
     // TODO dependency injection
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonBuilder() //
+        .registerTypeAdapter(Immutable.class, new ImmutableJsonSerializer()) //
+        .create();
     private final MySpecialReducer reducer = new MySpecialReducer();
 
     // TODO Optionals?
-    private ImmutableMySpecialState currentState = null;
+    private Immutable<MySpecialState> currentState = new Immutable<>(MySpecialState.class);
 
     @CrossOrigin(origins = "http://localhost:8080")
     @RequestMapping(value = "/", method = {RequestMethod.POST})
@@ -35,7 +40,9 @@ public class EfficientlyServer
         final Action action = gson.fromJson(json, Action.class);
         System.out.println("action: " + action);
 
-        final ImmutableMySpecialState newState = reducer.reduce(currentState, action);
+        final Immutable<MySpecialState> newState = reducer.reduce(currentState, action);
+
+        System.out.println("state diff: " + gson.toJson(currentState.diff(newState)));
 
         currentState = newState;
 

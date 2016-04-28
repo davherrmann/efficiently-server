@@ -1,22 +1,16 @@
 package de.davherrmann.efficiently.app;
 
-import org.immutables.gson.Gson;
-import org.immutables.value.Value;
-
-@Gson.TypeAdapters
-@Value.Immutable
 public interface MySpecialState
 {
 
-    ImmutableEWB ewb();
+    EWB ewb();
 
-    ImmutableAssistant assistant();
+    Assistant assistant();
 
     boolean wantToClose();
 
-    ImmutableItem[] items();
+    Item[] items();
 
-    @Value.Immutable
     interface EWB
     {
         String[] actions();
@@ -24,7 +18,6 @@ public interface MySpecialState
         String title();
     }
 
-    @Value.Immutable
     interface Assistant
     {
         String[] actions();
@@ -34,7 +27,6 @@ public interface MySpecialState
         int currentPage();
     }
 
-    @Value.Immutable
     interface Item
     {
         String firstname();
