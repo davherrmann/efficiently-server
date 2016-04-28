@@ -2,7 +2,7 @@ package de.davherrmann.efficiently.immutable;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Collections.emptyList;
-import static org.springframework.util.ClassUtils.isAssignable;
+import static org.apache.commons.lang3.ClassUtils.isAssignable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -43,6 +43,7 @@ public class Immutable<I>
 
     public <T> In<T> in(T method)
     {
+        // TODO can we rely on method as defaultValue?
         return new In<>(pathRecorder.lastCalledPath(), method);
     }
 
