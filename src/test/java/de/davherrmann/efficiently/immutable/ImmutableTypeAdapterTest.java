@@ -25,20 +25,34 @@ public class ImmutableTypeAdapterTest
     public void write_setInCustomType_works() throws Exception
     {
         // when
-        final Immutable<POJO> newImmutable = immutable.in(path.name().firstname()).set("Foo");
+        final Immutable<POJO> newImmutable = immutable //
+            .in(path.name().firstname()).set("Foo");
 
         // then
         assertThat(gson.toJson(newImmutable), is("{\"name\":{\"firstname\":\"Foo\"}}"));
     }
 
     @Test
-    public void write_overwriteCustomType_works() throws Exception
+    public void write_setCustomTypeObject_works() throws Exception
     {
         // when
-        final Immutable<POJO> newImmutable = immutable.in(path.name()).set(name("Foo", "Bar"));
+        final Immutable<POJO> newImmutable = immutable //
+            .in(path.name()).set(name("Foo", "Bar"));
 
         // then
         assertThat(gson.toJson(newImmutable), is("{\"name\":{\"firstname\":\"Foo\",\"lastname\":\"Bar\"}}"));
+    }
+
+    @Test
+    public void write_setInCustomType_withPreviousCustomTypeObject_works() throws Exception
+    {
+        // when
+        final Immutable<POJO> newImmutable = immutable //
+            .in(path.name()).set(name("Foo", "Bar")) //
+            .in(path.name().lastname()).set("B");
+
+        // then
+        assertThat(gson.toJson(newImmutable), is("{\"name\":{\"firstname\":\"Foo\",\"lastname\":\"B\"}}"));
     }
 
     private Immutable<POJO.Name> name(String firstname, String lastname)
