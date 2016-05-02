@@ -173,7 +173,7 @@ public class Immutable<I>
         }
     }
 
-    private interface ImmutableNode
+    interface ImmutableNode
     {
         Map<String, Object> values();
     }

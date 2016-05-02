@@ -15,7 +15,7 @@ import com.google.gson.GsonBuilder;
 import de.davherrmann.efficiently.app.MySpecialReducer;
 import de.davherrmann.efficiently.app.MySpecialState;
 import de.davherrmann.efficiently.immutable.Immutable;
-import de.davherrmann.efficiently.immutable.ImmutableJsonSerializer;
+import de.davherrmann.efficiently.immutable.ImmutableTypeAdapterFactory;
 
 @RestController
 @ComponentScan
@@ -23,10 +23,10 @@ import de.davherrmann.efficiently.immutable.ImmutableJsonSerializer;
 public class EfficientlyServer
 {
     // TODO dependency injection
-    private final Gson gson = new GsonBuilder() //
-        .registerTypeAdapter(Immutable.class, new ImmutableJsonSerializer()) //
-        .create();
     private final MySpecialReducer reducer = new MySpecialReducer();
+    private final Gson gson = new GsonBuilder() //
+        .registerTypeAdapterFactory(new ImmutableTypeAdapterFactory()) //
+        .create();
 
     // TODO Optionals?
     private Immutable<MySpecialState> currentState = new Immutable<>(MySpecialState.class);
@@ -38,8 +38,6 @@ public class EfficientlyServer
         System.out.println("got raw data: " + json);
 
         final Action action = gson.fromJson(json, Action.class);
-        System.out.println("action: " + action);
-
         final Immutable<MySpecialState> newState = reducer.reduce(currentState, action);
 
         System.out.println("state diff: " + gson.toJson(currentState.diff(newState)));
