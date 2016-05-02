@@ -10,6 +10,7 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
     public Immutable<MySpecialState> reduce(Immutable<MySpecialState> state, Action action)
     {
         final MySpecialState path = state.path();
+        final String actionId = action.actionId();
 
         switch (action.type())
         {
@@ -26,20 +27,21 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
                     .in(path.items()).set(persons());
 
             case "assistantAction":
-                if (action.actionId().equals("previous"))
+                if (actionId.equals("previous"))
+                    // TODO can this prevent path race conditions
                     return state.in(path.assistant().currentPage()).update(page -> page - 1);
-                if (action.actionId().equals("next"))
+                if (actionId.equals("next"))
                     return state.in(path.assistant().currentPage()).update(page -> page + 1);
-                if (action.actionId().equals("print"))
+                if (actionId.equals("print"))
                     return state.in(path.assistant().title()).update(title -> title + "!");
-                if (action.actionId().equals("save"))
+                if (actionId.equals("save"))
                     return state.in(path.assistant().actions()).set(new String[]{"print", "close"});
-                if (action.actionId().equals("close"))
+                if (actionId.equals("close"))
                     return state.in(path.wantToClose()).set(true);
                 break;
 
             case "dialogAction":
-                if (action.actionId().equals("reallyClose"))
+                if (actionId.equals("reallyClose"))
                     return state.in(path.wantToClose()).set(false);
 
         }
@@ -88,37 +90,13 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
 
     static MySpecialState.Item person(String firstName, String lastName, String thumbnail, String email)
     {
-        return new MySpecialState.Item()
-        {
-            @Override
-            public String firstname()
-            {
-                return firstName;
-            }
-
-            @Override
-            public String lastname()
-            {
-                return lastName;
-            }
-
-            @Override
-            public String thumbnail()
-            {
-                return thumbnail;
-            }
-
-            @Override
-            public String email()
-            {
-                return email;
-            }
-
-            @Override
-            public String additional()
-            {
-                return "asdf";
-            }
-        };
+        final Immutable<MySpecialState.Item> immutable = new Immutable<>(MySpecialState.Item.class);
+        final MySpecialState.Item path = immutable.path();
+        return immutable //
+            .in(path.firstname()).set(firstName) //
+            .in(path.lastname()).set(lastName) //
+            .in(path.thumbnail()).set(thumbnail) //
+            .in(path.email()).set(email) //
+            .asObject();
     }
 }
