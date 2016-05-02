@@ -195,14 +195,6 @@ public class ImmutableTest
     public void setIn_setsInCorrectPath_whenPathIsUsedInAnotherThread() throws Exception
     {
         // given
-        // TODO path now is a shared instance over several immutables. this is ok for single-threaded envs,
-        // TODO pretty ugly for multi-threaded ones.
-
-        // TODO maybe we could fix it by returning an object containing the path when calling path.foo().bar()
-        // TODO the challenge is primitive types -> return a wrapper type object and keep it in an IdentityHashMap mapping the object to a fq path
-
-        // TODO we can fix this by using ThreadLocals!! hooray
-
         path.name().firstname();
         final Thread thread = new Thread(() -> path.name().lastname());
         thread.start();
