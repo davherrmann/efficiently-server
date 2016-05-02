@@ -15,7 +15,14 @@ public class PathRecorder<I>
 {
     private final I path;
 
-    private List<String> lastPath = ImmutableList.of();
+    private ThreadLocal<List<String>> lastPath = new ThreadLocal<List<String>>()
+    {
+        @Override
+        protected List<String> initialValue()
+        {
+            return ImmutableList.of();
+        }
+    };
 
     public PathRecorder(Class<I> type)
     {
@@ -30,7 +37,7 @@ public class PathRecorder<I>
     @NotNull
     public List<String> lastCalledPath()
     {
-        return this.lastPath;
+        return this.lastPath.get();
     }
 
     @SuppressWarnings("unchecked")
@@ -52,15 +59,14 @@ public class PathRecorder<I>
         @Override
         protected Object handleInvocation(List<String> path, Method method) throws Throwable
         {
-            // TODO concurrency issues?
-            lastPath = pathWith(method);
+            lastPath.set(pathWith(method));
 
             final Class<?> returnType = method.getReturnType();
             final Object defaultValue = defaultValue(returnType);
 
             return defaultValue != null || !returnType.isInterface()
                 ? defaultValue
-                : pathFor(returnType, lastPath);
+                : pathFor(returnType, lastPath.get());
         }
     }
 

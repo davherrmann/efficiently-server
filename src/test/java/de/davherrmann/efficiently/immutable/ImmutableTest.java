@@ -2,6 +2,7 @@ package de.davherrmann.efficiently.immutable;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -188,6 +189,31 @@ public class ImmutableTest
         // then
         assertThat(newImmutable.asObject().name().firstname(), is("Foo"));
         assertThat(newImmutable.asObject().name().lastname(), is("B"));
+    }
+
+    @Test
+    public void setIn_setsInCorrectPath_whenPathIsUsedInAnotherThread() throws Exception
+    {
+        // given
+        // TODO path now is a shared instance over several immutables. this is ok for single-threaded envs,
+        // TODO pretty ugly for multi-threaded ones.
+
+        // TODO maybe we could fix it by returning an object containing the path when calling path.foo().bar()
+        // TODO the challenge is primitive types -> return a wrapper type object and keep it in an IdentityHashMap mapping the object to a fq path
+
+        // TODO we can fix this by using ThreadLocals!! hooray
+
+        path.name().firstname();
+        final Thread thread = new Thread(() -> path.name().lastname());
+        thread.start();
+        thread.join();
+
+        // when
+        final Immutable<POJO> newImmutable = immutable.in("NOT USING PATH").set("A");
+
+        // then
+        assertThat(newImmutable.asObject().name().firstname(), is("A"));
+        assertThat(newImmutable.asObject().name().lastname(), is(nullValue()));
     }
 
     private Immutable<POJO.Name> name(String firstname, String lastname)
