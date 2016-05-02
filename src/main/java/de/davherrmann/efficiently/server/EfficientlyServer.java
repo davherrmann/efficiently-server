@@ -10,12 +10,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import de.davherrmann.efficiently.app.MySpecialReducer;
 import de.davherrmann.efficiently.app.MySpecialState;
 import de.davherrmann.efficiently.immutable.Immutable;
-import de.davherrmann.efficiently.immutable.ImmutableTypeAdapterFactory;
 
 @RestController
 @ComponentScan
@@ -24,9 +22,7 @@ public class EfficientlyServer
 {
     // TODO dependency injection
     private final MySpecialReducer reducer = new MySpecialReducer();
-    private final Gson gson = new GsonBuilder() //
-        .registerTypeAdapterFactory(new ImmutableTypeAdapterFactory()) //
-        .create();
+    private final Gson gson = new Gson();
 
     // TODO Optionals?
     private Immutable<MySpecialState> currentState = new Immutable<>(MySpecialState.class);
