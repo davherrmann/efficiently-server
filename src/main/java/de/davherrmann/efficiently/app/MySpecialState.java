@@ -1,5 +1,7 @@
 package de.davherrmann.efficiently.app;
 
+import java.util.List;
+
 public interface MySpecialState
 {
 
@@ -9,7 +11,7 @@ public interface MySpecialState
 
     boolean wantToClose();
 
-    Item[] items();
+    List<Item> items();
 
     interface EWB
     {

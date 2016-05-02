@@ -1,5 +1,10 @@
 package de.davherrmann.efficiently.app;
 
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+
+import de.davherrmann.efficiently.app.MySpecialState.Item;
 import de.davherrmann.efficiently.immutable.Immutable;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
@@ -44,14 +49,22 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
                 if (actionId.equals("reallyClose"))
                     return state.in(path.wantToClose()).set(false);
 
+            case "requestNewItems":
+                return state.in(path.items()).update(items -> items.size() > 100
+                    ? items
+                    : ImmutableList.<Item>builder() //
+                        .addAll(items) //
+                        .addAll(persons()) //
+                        .build());
+
         }
 
         return state;
     }
 
-    static MySpecialState.Item[] persons()
+    static List<Item> persons()
     {
-        return new MySpecialState.Item[]{
+        return ImmutableList.<Item>builder().add(
             person("hilla", "sakala", "https://randomuser.me/api/portraits/thumb/women/32.jpg",
                 "hilla.sakala@example.com"),
             person("samuel", "mitchell", "https://randomuser.me/api/portraits/thumb/men/2.jpg",
@@ -85,13 +98,14 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
             person("roméo", "morin", "https://randomuser.me/api/portraits/thumb/men/93.jpg", "roméo.morin@example.com"),
             person("leo", "li", "https://randomuser.me/api/portraits/thumb/men/95.jpg", "leo.li@example.com"),
             person("ayşe", "tuğlu", "https://randomuser.me/api/portraits/thumb/women/12.jpg",
-                "ayşe.tuğlu@example.com")};
+                "ayşe.tuğlu@example.com")) //
+            .build();
     }
 
-    static MySpecialState.Item person(String firstName, String lastName, String thumbnail, String email)
+    static Item person(String firstName, String lastName, String thumbnail, String email)
     {
-        final Immutable<MySpecialState.Item> immutable = new Immutable<>(MySpecialState.Item.class);
-        final MySpecialState.Item path = immutable.path();
+        final Immutable<Item> immutable = new Immutable<>(Item.class);
+        final Item path = immutable.path();
         return immutable //
             .in(path.firstname()).set(firstName) //
             .in(path.lastname()).set(lastName) //
