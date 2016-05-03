@@ -33,7 +33,6 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
 
             case "assistantAction":
                 if (actionId.equals("previous"))
-                    // TODO can this prevent path race conditions
                     return state.in(path.assistant().currentPage()).update(page -> page - 1);
                 if (actionId.equals("next"))
                     return state.in(path.assistant().currentPage()).update(page -> page + 1);
