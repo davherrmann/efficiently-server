@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class ImmutableListTest
 {
-    private final ImmutableList<String> immutableList = new ImmutableList<>(String.class);
+    private final ImmutableList<String> immutableList = new ImmutableList<>();
     @Test
     public void asList_returnsEmptyList_whenCalledInitially() throws Exception
     {

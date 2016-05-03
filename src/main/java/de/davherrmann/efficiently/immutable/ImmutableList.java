@@ -7,17 +7,15 @@ import com.google.gson.annotations.JsonAdapter;
 @JsonAdapter(ImmutableListTypeAdapter.class)
 public class ImmutableList<I>
 {
-    private final Class<I> type;
     private final List<I> values;
 
-    public ImmutableList(Class<I> type)
+    public ImmutableList()
     {
-        this(type, com.google.common.collect.ImmutableList.of());
+        this(com.google.common.collect.ImmutableList.of());
     }
 
-    private ImmutableList(Class<I> type, List<I> initialValues)
+    private ImmutableList(List<I> initialValues)
     {
-        this.type = type;
         this.values = initialValues;
     }
 
@@ -25,7 +23,7 @@ public class ImmutableList<I>
 
     ImmutableList<I> add(I item)
     {
-        return new ImmutableList<>(type, com.google.common.collect.ImmutableList.<I>builder() //
+        return new ImmutableList<>(com.google.common.collect.ImmutableList.<I>builder() //
             .addAll(values) //
             .add(item) //
             .build());
@@ -33,7 +31,7 @@ public class ImmutableList<I>
 
     public ImmutableList<I> addAll(List<I> items)
     {
-        return new ImmutableList<>(type, com.google.common.collect.ImmutableList.<I>builder() //
+        return new ImmutableList<>(com.google.common.collect.ImmutableList.<I>builder() //
             .addAll(values) //
             .addAll(items) //
             .build());
