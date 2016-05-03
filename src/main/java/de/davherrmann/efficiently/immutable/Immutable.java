@@ -47,14 +47,12 @@ public class Immutable<I>
     public <T> In<T> in(T method)
     {
         // TODO can we rely on method as defaultValue?
-        final List<String> path = pathRecorder.lastCalledPath();
+        return new In<>(getAndCheckLastPath(), method);
+    }
 
-        if (path.isEmpty())
-        {
-            throw new IllegalStateException("No path was recorded. Did you use the correct Immutable#path()?");
-        }
-
-        return new In<>(path, method);
+    public <LT, T extends List<LT>> InList<LT> in(T method)
+    {
+        return new InList<>(getAndCheckLastPath(), method);
     }
 
     public Immutable<I> diff(Immutable<I> immutable)
@@ -101,11 +99,65 @@ public class Immutable<I>
                         : value))),  //
                 pathRecorder);
         }
+
         private Object immutableNodeOr(T value)
         {
             return value instanceof ImmutableNode
                 ? ((ImmutableNode) value).values()
                 : value;
+        }
+    }
+
+    public class InList<LT>
+    {
+        private final List<String> path;
+        private final List<LT> defaultValue;
+
+        public InList(List<String> path, List<LT> defaultValue)
+        {
+            this.path = path;
+            this.defaultValue = defaultValue;
+        }
+
+        public Immutable<I> set(List<LT> value)
+        {
+            return new Immutable<>(type, nextImmutable.setIn(values, path, value), pathRecorder);
+        }
+
+        public Immutable<I> set(ImmutableList<LT> value)
+        {
+            return set(value.asList());
+        }
+
+        @SuppressWarnings("unchecked")
+        public Immutable<I> update(Function<ImmutableList<LT>, ImmutableList<LT>> updater)
+        {
+            return new Immutable<>( //
+                type, //
+                nextImmutable.updateIn( //
+                    values, //
+                    path, //
+                    value -> updater.apply(value == null
+                        ? new ImmutableList<>()
+                        : new ImmutableList<LT>() //
+                            .addAll((List<LT>) value)) //
+                        .asList()),  //
+                pathRecorder);
+        }
+
+        // TODO check for redundant code!
+        @SuppressWarnings("unchecked")
+        public Immutable<I> updateList(Function<List<LT>, List<LT>> updater)
+        {
+            return new Immutable<>( //
+                type, //
+                nextImmutable.updateIn( //
+                    values, //
+                    path, //
+                    value -> updater.apply(value == null
+                        ? defaultValue
+                        : (List<LT>) value)), //
+                pathRecorder);
         }
     }
 
@@ -135,10 +187,22 @@ public class Immutable<I>
     private <T> T immutableFor(Class<T> type, List<String> nestedPath)
     {
         return (T) Proxy.newProxyInstance( //
-            type.getClassLoader(), //
+            ImmutableNode.class.getClassLoader(), //
             new Class[]{type, ImmutableNode.class}, //
             new ImmutableObjectInvocationHandler(nestedPath) //
         );
+    }
+
+    private List<String> getAndCheckLastPath()
+    {
+        final List<String> path = pathRecorder.lastCalledPath();
+
+        if (path.isEmpty())
+        {
+            throw new IllegalStateException("No path was recorded. Did you use the correct Immutable#path()?");
+        }
+
+        return path;
     }
 
     private class ImmutableObjectInvocationHandler extends AbstractPathInvocationHandler

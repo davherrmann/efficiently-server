@@ -1,11 +1,13 @@
 package de.davherrmann.efficiently.immutable;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Rule;
@@ -208,6 +210,47 @@ public class ImmutableTest
         assertThat(newImmutable.asObject().name().lastname(), is(nullValue()));
     }
 
+    @Test
+    public void get_returnsCorrectList_whenImmutableListWasSet() throws Exception
+    {
+        // given / when
+        final Immutable<POJO> newImmutable = immutable.in(path.titles()).set(new ImmutableList<String>() //
+            .add("foo").add("bar"));
+
+        // then
+        assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
+    }
+
+    @Test
+    public void get_returnsCorrectList_whenListWasSet() throws Exception
+    {
+        // given / when
+        final Immutable<POJO> newImmutable = immutable.in(path.titles()).set(newArrayList("foo", "bar"));
+
+        // then
+        assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
+    }
+
+    @Test
+    public void get_returnsUpdatedList_whenListWasUpdated() throws Exception
+    {
+        // given / when
+        final Immutable<POJO> newImmutable = immutable.in(path.titles()).updateList(list -> newArrayList("foo", "bar"));
+
+        // then
+        assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
+    }
+
+    @Test
+    public void get_returnsUpdatedList_whenImmutableListWasUpdated() throws Exception
+    {
+        // given / when
+        final Immutable<POJO> newImmutable = immutable.in(path.titles()).update(list -> list.add("foo").add("bar"));
+
+        // then
+        assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
+    }
+
     private Immutable<POJO.Name> name(String firstname, String lastname)
     {
         final Immutable<POJO.Name> immutable = new Immutable<>(POJO.Name.class);
@@ -221,6 +264,8 @@ public class ImmutableTest
     {
         String title();
 
+        List<String> titles();
+
         boolean wantToClose();
 
         int currentPage();
@@ -228,8 +273,6 @@ public class ImmutableTest
         Map<String, String> myMap();
 
         POJO pojo();
-
-        Name[] names();
 
         Name name();
 

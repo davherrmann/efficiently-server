@@ -1,8 +1,8 @@
 package de.davherrmann.efficiently.app;
 
-import java.util.List;
+import static com.google.common.collect.Lists.newArrayList;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 
 import de.davherrmann.efficiently.app.MySpecialState.Item;
 import de.davherrmann.efficiently.immutable.Immutable;
@@ -52,11 +52,7 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
             case "requestNewItems":
                 return state.in(path.items()).update(items -> items.size() > 100
                     ? items
-                    : ImmutableList.<Item>builder() //
-                        .addAll(items) //
-                        .addAll(persons()) //
-                        .build());
-
+                    : items.addAll(persons()));
         }
 
         return state;
@@ -64,9 +60,8 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
 
     static List<Item> persons()
     {
-        return ImmutableList.<Item>builder().add(
-            person("hilla", "sakala", "https://randomuser.me/api/portraits/thumb/women/32.jpg",
-                "hilla.sakala@example.com"),
+        return newArrayList(person("hilla", "sakala", "https://randomuser.me/api/portraits/thumb/women/32.jpg",
+            "hilla.sakala@example.com"),
             person("samuel", "mitchell", "https://randomuser.me/api/portraits/thumb/men/2.jpg",
                 "samuel.mitchell@example.com"),
             person("helmi", "ranta", "https://randomuser.me/api/portraits/thumb/women/18.jpg",
@@ -98,8 +93,7 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
             person("roméo", "morin", "https://randomuser.me/api/portraits/thumb/men/93.jpg", "roméo.morin@example.com"),
             person("leo", "li", "https://randomuser.me/api/portraits/thumb/men/95.jpg", "leo.li@example.com"),
             person("ayşe", "tuğlu", "https://randomuser.me/api/portraits/thumb/women/12.jpg",
-                "ayşe.tuğlu@example.com")) //
-            .build();
+                "ayşe.tuğlu@example.com"));
     }
 
     static Item person(String firstName, String lastName, String thumbnail, String email)
