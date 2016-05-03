@@ -26,6 +26,7 @@ public class NextImmutable
         return getInPath(dataStructure(nestedValue), path.subList(1, path.size()));
     }
 
+    // TODO is defensive copying task of NextImmutable? Or the layer above?
     // TODO extend for other mutable types!
     // TODO extract
     private Object defensiveCopyOf(Object value)
