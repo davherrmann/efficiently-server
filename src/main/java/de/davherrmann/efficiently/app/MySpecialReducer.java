@@ -17,6 +17,8 @@ public class MySpecialReducer implements Reducer<Immutable<MySpecialState>>
         final MySpecialState path = state.path();
         final String actionId = action.actionId();
 
+        // TODO show asynchronous service call! waiting for service, dispatching action, service answer
+
         switch (action.type())
         {
             case "initState":
