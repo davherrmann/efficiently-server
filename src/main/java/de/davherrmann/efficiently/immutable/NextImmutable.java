@@ -3,6 +3,7 @@ package de.davherrmann.efficiently.immutable;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +20,28 @@ public class NextImmutable
 
         if (path.size() == 1 || nestedValue == null)
         {
-            return nestedValue;
+            return defensiveCopyOf(nestedValue);
         }
 
         return getInPath(dataStructure(nestedValue), path.subList(1, path.size()));
+    }
+
+    // TODO extend for other mutable types!
+    // TODO extract
+    private Object defensiveCopyOf(Object value)
+    {
+        if (value == null)
+        {
+            return null;
+        }
+
+        if (value.getClass().isArray())
+        {
+            final Object[] array = (Object[]) value;
+            return Arrays.copyOf(array, array.length);
+        }
+
+        return value;
     }
 
     public Map<String, Object> updateIn(Map<String, Object> dataStructure, List<String> path,
@@ -43,7 +62,7 @@ public class NextImmutable
             .flatMap(Collection::stream) //
             .collect(toMap( //
                 e -> e.getKey(), //
-                e -> e.getValue(), //
+                e -> defensiveCopyOf(e.getValue()), //
                 (oldValue, newValue) -> isDataStructure(oldValue) && isDataStructure(newValue)
                     ? merge(dataStructure(oldValue), dataStructure(newValue))
                     : newValue)));

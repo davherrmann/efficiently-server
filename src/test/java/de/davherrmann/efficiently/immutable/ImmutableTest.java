@@ -251,6 +251,33 @@ public class ImmutableTest
         assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
     }
 
+    @Test
+    public void get_returnsClonedArray_whenMutableArrayWasSet() throws Exception
+    {
+        // given
+        final Immutable<POJO> newImmutable = immutable.in(path.titleArray()).set(new String[]{"foo", "bar"});
+
+        // when
+        newImmutable.asObject().titleArray()[1] = "baz";
+
+        // then
+        assertThat(newImmutable.asObject().titleArray(), is(new String[]{"foo", "bar"}));
+    }
+
+    @Test
+    public void changingASetMutableArray_doesNotChangeImmutable() throws Exception
+    {
+        // given
+        final String[] array = {"foo", "bar"};
+        final Immutable<POJO> newImmutable = immutable.in(path.titleArray()).set(array);
+
+        // when
+        array[1] = "baz";
+
+        // then
+        assertThat(newImmutable.asObject().titleArray(), is(new String[]{"foo", "bar"}));
+    }
+
     private Immutable<POJO.Name> name(String firstname, String lastname)
     {
         final Immutable<POJO.Name> immutable = new Immutable<>(POJO.Name.class);
@@ -265,6 +292,8 @@ public class ImmutableTest
         String title();
 
         List<String> titles();
+
+        String[] titleArray();
 
         boolean wantToClose();
 
