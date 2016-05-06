@@ -14,7 +14,7 @@ public class AsyncDispatcher
     private final ScheduledExecutorService executorService = newScheduledThreadPool(1);
 
     // TODO api: return true if waiting for async action, return false if not? or dispatch: "waiting for async"?
-    public void dispatch(Dispatcher syncDispatcher, Action action)
+    public void dispatch(Dispatcher syncDispatcher, Action<?> action)
     {
         // TODO show best practice for testing synchronously
         if (action.type().equals("assistantAction/print"))

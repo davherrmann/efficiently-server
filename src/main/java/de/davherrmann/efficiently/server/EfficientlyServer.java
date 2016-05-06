@@ -39,7 +39,7 @@ public class EfficientlyServer implements Dispatcher
     }
 
     @Override
-    public void dispatch(Action action)
+    public void dispatch(Action<?> action)
     {
         System.out.println("dispatching action: " + action.type());
 
