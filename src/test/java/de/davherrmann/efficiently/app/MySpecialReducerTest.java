@@ -25,7 +25,7 @@ public class MySpecialReducerTest
     {
         // given / when
         final Immutable<MySpecialState> state = reducer.reduce(initialState, initialState.path(),
-            action("assistantAction", "next"));
+            action("assistantAction/next"));
 
         // then
         assertThat(state.asObject().assistant().currentPage(), is(3));
@@ -39,24 +39,6 @@ public class MySpecialReducerTest
             public String type()
             {
                 return type;
-            }
-        };
-    }
-
-    private Action action(final String type, final String actionId)
-    {
-        return new Action()
-        {
-            @Override
-            public String type()
-            {
-                return type;
-            }
-
-            @Override
-            public String actionId()
-            {
-                return actionId;
             }
         };
     }
