@@ -49,7 +49,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         // TODO pass action as parameter as well!
         // TODO findFirst vs all?
         reducers.add(".*", (state, path, action) -> {
-            System.out.println("we have no reducer for action: " + action.actionId());
+            System.out.println("we have no reducer for action: " + action.type());
             return state  //
                 .in(path.assistant().title()).update(title -> title + "!");
         });

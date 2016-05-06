@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-
 import de.davherrmann.efficiently.immutable.Immutable;
 
 public class Reducers<S> implements Reducer<S>
@@ -21,22 +18,17 @@ public class Reducers<S> implements Reducer<S>
         reducers.add(new ReducerMapping(Pattern.compile(actionRegEx), reducer));
     }
 
-    public void add(String actionRegEx, Reducer<S> reducer)
+    public void add(String actionTypeRegEx, Reducer<S> reducer)
     {
-        reducers.add(new ReducerMapping(Pattern.compile(actionRegEx),
+        reducers.add(new ReducerMapping(Pattern.compile(actionTypeRegEx),
             state -> path -> action -> reducer.reduce(state, path, action)));
     }
 
     @Override
     public Immutable<S> reduce(Immutable<S> state, S path, Action action)
     {
-        final Joiner joiner = Joiner.on("/");
-        final String actionString = Lists.<String>newArrayList(action.type(), action.actionId()).stream() //
-            .filter(item -> item != null && !item.isEmpty()) //
-            .reduce(joiner::join) //
-            .orElse("");
         return reducers.stream() //
-            .filter(r -> r.pattern().matcher(actionString).matches()) //
+            .filter(r -> r.pattern().matcher(action.type()).matches()) //
             .map(r -> r.reducer() //
                 .apply(state) //
                 .apply(path) //

@@ -1,17 +1,21 @@
 package de.davherrmann.efficiently.server;
 
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
+
 public class Action
 {
     private String type = "";
-    private String actionId = "";
+    private Map<String, String> meta = ImmutableMap.of();
 
     public String type()
     {
         return type;
     }
 
-    public String actionId()
+    public Map<String, String> meta()
     {
-        return actionId;
+        return meta;
     }
 }
