@@ -34,7 +34,7 @@ public class EfficientlyServer
         System.out.println("got raw data: " + json);
 
         final Action action = gson.fromJson(json, Action.class);
-        final Immutable<MySpecialState> newState = reducer.reduce(currentState, action);
+        final Immutable<MySpecialState> newState = reducer.reduce(currentState, currentState.path(), action);
 
         System.out.println("state diff: " + gson.toJson(currentState.diff(newState)));
 
