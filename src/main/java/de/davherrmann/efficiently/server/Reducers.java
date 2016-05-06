@@ -13,7 +13,7 @@ public class Reducers<S> implements Reducer<S>
     private List<ReducerMapping> reducers = newArrayList();
 
     // TODO do we need this monad arg?
-    public void add(String actionRegEx, Function<Immutable<S>, Function<S, Function<Action, Immutable<S>>>> reducer)
+    public void add(String actionRegEx, Function<Immutable<S>, Function<S, Function<Action<?>, Immutable<S>>>> reducer)
     {
         reducers.add(new ReducerMapping(Pattern.compile(actionRegEx), reducer));
     }
@@ -25,7 +25,7 @@ public class Reducers<S> implements Reducer<S>
     }
 
     @Override
-    public Immutable<S> reduce(Immutable<S> state, S path, Action action)
+    public Immutable<S> reduce(Immutable<S> state, S path, Action<?> action)
     {
         return reducers.stream() //
             .filter(r -> r.pattern().matcher(action.type()).matches()) //
@@ -40,10 +40,10 @@ public class Reducers<S> implements Reducer<S>
     private class ReducerMapping
     {
         private final Pattern pattern;
-        private final Function<Immutable<S>, Function<S, Function<Action, Immutable<S>>>> reducer;
+        private final Function<Immutable<S>, Function<S, Function<Action<?>, Immutable<S>>>> reducer;
 
         public ReducerMapping(Pattern pattern,
-            Function<Immutable<S>, Function<S, Function<Action, Immutable<S>>>> reducer)
+            Function<Immutable<S>, Function<S, Function<Action<?>, Immutable<S>>>> reducer)
         {
             this.pattern = pattern;
             this.reducer = reducer;
@@ -54,7 +54,7 @@ public class Reducers<S> implements Reducer<S>
             return pattern;
         }
 
-        public Function<Immutable<S>, Function<S, Function<Action, Immutable<S>>>> reducer()
+        public Function<Immutable<S>, Function<S, Function<Action<?>, Immutable<S>>>> reducer()
         {
             return reducer;
         }
