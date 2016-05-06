@@ -13,6 +13,9 @@ public class MySpecialReducer implements Reducer<MySpecialState>
     {
         // TODO show asynchronous service call
 
+        // TODO custom action types?
+        // reducers.add("assistantAction/reallyPrint", MySpecialAction.class, (state, path, action) -> state);
+
         // initialise state
         reducers.add("initState", (state, path, action) -> state.clear() //
             .in(path.ewb().actions()).set(new String[]{"print", "close", "save"}) //
