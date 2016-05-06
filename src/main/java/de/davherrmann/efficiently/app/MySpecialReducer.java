@@ -45,6 +45,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.assistant().currentPage()).update(page -> page - 1));
         reducers.add("assistantAction/close", state -> path -> action -> state //
             .in(path.wantToClose()).set(true));
+        // TODO casting is not really safe here, could be any action
         reducers.add("assistantAction/reallyPrint", (state, path, action) -> state //
             .in(path.assistant().title()).set(((MySpecialAction) action).meta()));
 
