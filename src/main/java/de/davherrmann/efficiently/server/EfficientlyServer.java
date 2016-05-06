@@ -28,6 +28,7 @@ public class EfficientlyServer implements Dispatcher
     private final Gson gson = new Gson();
 
     // TODO Optionals?
+    private Immutable<MySpecialState> lastSentState = new Immutable<>(MySpecialState.class);
     private Immutable<MySpecialState> state = new Immutable<>(MySpecialState.class);
 
     @CrossOrigin(origins = "http://localhost:8080")
@@ -35,7 +36,11 @@ public class EfficientlyServer implements Dispatcher
     String reduce(@RequestBody final String json)
     {
         dispatch(gson.fromJson(json, StandardAction.class));
-        return gson.toJson(state);
+        final Immutable<MySpecialState> diff = lastSentState.diff(state);
+        System.out.println("state diff: " + gson.toJson(diff));
+        lastSentState = state;
+        // TODO we could send the diff here! client side handling!
+        return gson.toJson(lastSentState);
     }
 
     @Override
@@ -44,12 +49,7 @@ public class EfficientlyServer implements Dispatcher
         System.out.println("dispatching action: " + action.type());
 
         asyncDispatcher.dispatch(this, action);
-
-        final Immutable<MySpecialState> newState = reducer.reduce(state, state.path(), action);
-
-        System.out.println("state diff: " + gson.toJson(state.diff(newState)));
-
-        state = newState;
+        state = reducer.reduce(state, state.path(), action);
     }
 
     public static void main(String[] args) throws Exception

@@ -30,7 +30,10 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.assistant().currentPage()).set(2) //
 
             .in(path.wantToClose()).set(false) //
-            .in(path.items()).set(PersonService.persons()));
+            .in(path.items()).set(PersonService.persons()) //
+
+            .in(path.user().firstname()).set("Foo") //
+            .in(path.user().lastname()).set("Bar"));
 
         // TODO should/can the framework do this?
         reducers.add("startWaitingForAsync", (state, path, action) -> state //

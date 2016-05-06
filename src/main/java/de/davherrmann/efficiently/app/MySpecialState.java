@@ -15,6 +15,8 @@ public interface MySpecialState
 
     boolean waitingForAsync();
 
+    Form user();
+
     interface EWB
     {
         String[] actions();
@@ -42,5 +44,14 @@ public interface MySpecialState
         String email();
 
         String additional();
+    }
+
+    interface Form
+    {
+        String firstname();
+
+        String lastname();
+
+        String email();
     }
 }
