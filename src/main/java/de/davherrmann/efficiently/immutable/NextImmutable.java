@@ -1,9 +1,10 @@
 package de.davherrmann.efficiently.immutable;
 
+import static de.davherrmann.efficiently.immutable.Compare.areEqual;
+import static de.davherrmann.efficiently.immutable.Copy.defensiveCopyOf;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -24,25 +25,6 @@ public class NextImmutable
         }
 
         return getInPath(dataStructure(nestedValue), path.subList(1, path.size()));
-    }
-
-    // TODO is defensive copying task of NextImmutable? Or the layer above?
-    // TODO extend for other mutable types!
-    // TODO extract
-    private Object defensiveCopyOf(Object value)
-    {
-        if (value == null)
-        {
-            return null;
-        }
-
-        if (value.getClass().isArray())
-        {
-            final Object[] array = (Object[]) value;
-            return Arrays.copyOf(array, array.length);
-        }
-
-        return value;
     }
 
     public Map<String, Object> updateIn(Map<String, Object> dataStructure, List<String> path,
@@ -74,7 +56,7 @@ public class NextImmutable
         return Stream.of(dataStructure1) //
             .map(m -> m.entrySet()) //
             .flatMap(Collection::stream) //
-            .filter(e -> e.getValue() != null && !e.getValue().equals(dataStructure0.get(e.getKey()))) //
+            .filter(e -> !areEqual(e.getValue(), dataStructure0.get(e.getKey()))) //
             .map(e -> {
                 final String key = e.getKey();
                 final Object newValue = e.getValue();

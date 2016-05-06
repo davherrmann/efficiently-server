@@ -1,6 +1,7 @@
 package de.davherrmann.efficiently.immutable;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.nullValue;
@@ -276,6 +277,41 @@ public class ImmutableTest
 
         // then
         assertThat(newImmutable.asObject().titleArray(), is(new String[]{"foo", "bar"}));
+    }
+
+    @Test
+    public void diff_ofImmutablesWithEqualStringSet_shouldBeEmpty() throws Exception
+    {
+        // given
+        final Immutable<POJO> immutable1 = immutable.in(path.title()).set("foo");
+        final Immutable<POJO> immutable2 = immutable.in(path.title()).set("foo");
+
+        // when
+        final Immutable<POJO> diff = immutable1.diff(immutable2);
+
+        // then
+        assertThat(diff.values(), is(newHashMap()));
+    }
+
+    @Test
+    public void diff_ofImmutablesWithEqualArrays_shouldBeEmpty() throws Exception
+    {
+        // given
+        final Immutable<POJO> immutable1 = immutable.in(path.titleArray()).set(new String[]{"foo", "bar"});
+        final Immutable<POJO> immutable2 = immutable.in(path.titleArray()).set(new String[]{"foo", "bar"});
+
+        // when
+        final Immutable<POJO> diff = immutable1.diff(immutable2);
+
+        // then
+        assertThat(diff.values(), is(newHashMap()));
+    }
+
+    @Test
+    public void equals_forTwoArraysWithSameContent_isTrue() throws Exception
+    {
+        // given / then
+        assertThat(Compare.areEqual(new String[]{"foo", "bar"}, new String[]{"foo", "bar"}), is(true));
     }
 
     private Immutable<POJO.Name> name(String firstname, String lastname)
