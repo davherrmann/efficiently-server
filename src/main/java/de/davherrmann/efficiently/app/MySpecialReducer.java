@@ -25,6 +25,12 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.wantToClose()).set(false) //
             .in(path.items()).set(PersonService.persons()));
 
+        // TODO should/can the framework do this?
+        reducers.add("startWaitingForAsync", (state, path, action) -> state //
+            .in(path.waitingForAsync()).set(true));
+        reducers.add("stopWaitingForAsync", (state, path, action) -> state //
+            .in(path.waitingForAsync()).set(false));
+
         // assistant actions
         reducers.add("assistantAction/next", state -> path -> action -> state //
             .in(path.assistant().currentPage()).update(page -> page + 1));
@@ -32,6 +38,8 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.assistant().currentPage()).update(page -> page - 1));
         reducers.add("assistantAction/close", state -> path -> action -> state //
             .in(path.wantToClose()).set(true));
+        reducers.add("assistantAction/reallyPrint", (state, path, action) -> state //
+            .in(path.assistant().title()).set(((MySpecialAction) action).meta()));
 
         // dialog actions
         reducers.add("dialogAction/reallyClose", (state, path, action) -> state //

@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import de.davherrmann.efficiently.immutable.Immutable;
 import de.davherrmann.efficiently.server.Action;
+import de.davherrmann.efficiently.server.StandardAction;
 
 public class MySpecialReducerTest
 {
@@ -33,7 +34,7 @@ public class MySpecialReducerTest
 
     private Action action(final String type)
     {
-        return new Action()
+        return new StandardAction()
         {
             @Override
             public String type()

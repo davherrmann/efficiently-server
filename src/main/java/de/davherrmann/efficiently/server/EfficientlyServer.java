@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 
+import de.davherrmann.efficiently.app.AsyncDispatcher;
 import de.davherrmann.efficiently.app.MySpecialReducer;
 import de.davherrmann.efficiently.app.MySpecialState;
 import de.davherrmann.efficiently.immutable.Immutable;
@@ -22,17 +23,18 @@ public class EfficientlyServer implements Dispatcher
 {
     // TODO dependency injection
     private final MySpecialReducer reducer = new MySpecialReducer();
+    private AsyncDispatcher asyncDispatcher = new AsyncDispatcher();
+
     private final Gson gson = new Gson();
 
     // TODO Optionals?
     private Immutable<MySpecialState> state = new Immutable<>(MySpecialState.class);
-    private AsyncDispatcher asyncDispatcher = new AsyncDispatcher();
 
     @CrossOrigin(origins = "http://localhost:8080")
     @RequestMapping(value = "/", method = {RequestMethod.POST})
     String reduce(@RequestBody final String json)
     {
-        dispatch(gson.fromJson(json, Action.class));
+        dispatch(gson.fromJson(json, StandardAction.class));
         return gson.toJson(state);
     }
 

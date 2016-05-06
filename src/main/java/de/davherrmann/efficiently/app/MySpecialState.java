@@ -13,6 +13,8 @@ public interface MySpecialState
 
     List<Item> items();
 
+    boolean waitingForAsync();
+
     interface EWB
     {
         String[] actions();
