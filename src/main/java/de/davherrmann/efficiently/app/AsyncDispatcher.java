@@ -16,7 +16,7 @@ public class AsyncDispatcher
     // TODO api: return true if waiting for async action, return false if not? or dispatch: "waiting for async"?
     public void dispatch(Dispatcher syncDispatcher, Action<?> action)
     {
-        // TODO show best practice for testing synchronously
+        // TODO show best practice for testing synchronously (possibly with futures?)
         if (action.type().equals("assistantAction/print"))
         {
             executorService.schedule( //
