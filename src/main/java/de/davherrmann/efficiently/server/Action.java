@@ -14,6 +14,7 @@ public class Action
         return type;
     }
 
+    // TODO allow typed Action? with immutable data? returning from asynchronous service call?
     public Map<String, String> meta()
     {
         return meta;

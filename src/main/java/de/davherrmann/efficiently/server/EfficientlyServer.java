@@ -18,29 +18,36 @@ import de.davherrmann.efficiently.immutable.Immutable;
 @RestController
 @ComponentScan
 @EnableAutoConfiguration
-public class EfficientlyServer
+public class EfficientlyServer implements Dispatcher
 {
     // TODO dependency injection
     private final MySpecialReducer reducer = new MySpecialReducer();
     private final Gson gson = new Gson();
 
     // TODO Optionals?
-    private Immutable<MySpecialState> currentState = new Immutable<>(MySpecialState.class);
+    private Immutable<MySpecialState> state = new Immutable<>(MySpecialState.class);
+    private AsyncDispatcher asyncDispatcher = new AsyncDispatcher();
 
     @CrossOrigin(origins = "http://localhost:8080")
     @RequestMapping(value = "/", method = {RequestMethod.POST})
     String reduce(@RequestBody final String json)
     {
-        System.out.println("got raw data: " + json);
+        dispatch(gson.fromJson(json, Action.class));
+        return gson.toJson(state);
+    }
 
-        final Action action = gson.fromJson(json, Action.class);
-        final Immutable<MySpecialState> newState = reducer.reduce(currentState, currentState.path(), action);
+    @Override
+    public void dispatch(Action action)
+    {
+        System.out.println("dispatching action: " + action.type());
 
-        System.out.println("state diff: " + gson.toJson(currentState.diff(newState)));
+        asyncDispatcher.dispatch(this, action);
 
-        currentState = newState;
+        final Immutable<MySpecialState> newState = reducer.reduce(state, state.path(), action);
 
-        return gson.toJson(newState);
+        System.out.println("state diff: " + gson.toJson(state.diff(newState)));
+
+        state = newState;
     }
 
     public static void main(String[] args) throws Exception
