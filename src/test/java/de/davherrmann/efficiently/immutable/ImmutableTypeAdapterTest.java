@@ -16,7 +16,7 @@ public class ImmutableTypeAdapterTest
     public void wrappingImmutableTypeAdapterFactory_works() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path.pojo()).set(immutable.asObject());
+        final Immutable<POJO> newImmutable = immutable.in(path::pojo).set(immutable.asObject());
 
         // then
         assertThat(new Gson().toJson(newImmutable), is("{\"pojo\":{}}"));

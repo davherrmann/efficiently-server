@@ -51,10 +51,10 @@ public class PersonService
         final Immutable<MySpecialState.Item> immutable = new Immutable<>(MySpecialState.Item.class);
         final MySpecialState.Item path = immutable.path();
         return immutable //
-            .in(path.firstname()).set(firstName) //
-            .in(path.lastname()).set(lastName) //
-            .in(path.thumbnail()).set(thumbnail) //
-            .in(path.email()).set(email) //
+            .in(path::firstname).set(firstName) //
+            .in(path::lastname).set(lastName) //
+            .in(path::thumbnail).set(thumbnail) //
+            .in(path::email).set(email) //
             .asObject();
     }
 }

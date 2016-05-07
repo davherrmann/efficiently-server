@@ -18,48 +18,48 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
         // TODO could we use method references in path?
         // careful: type erasure -> Supplier == Supplier -> no difference between List<T> and T
-        //reducers.add("", state -> path -> action -> state.in(path.assistant()::title).set(""));
+        // reducers.add("", state -> path -> action -> state.in(path.assistant()::title).set(""));
 
         // initialise state
         reducers.add("initState", (state, path, action) -> state.clear() //
-            .in(path.ewb().actions()).set(new String[]{"print", "close", "save"}) //
-            .in(path.ewb().title()).set("MyEWB") //
+            .in(path.ewb()::actions).set(new String[]{"print", "close", "save"}) //
+            .in(path.ewb()::title).set("MyEWB") //
 
-            .in(path.assistant().actions()).set(new String[]{"print", "close", "save"}) //
-            .in(path.assistant().title()).set("MyAssistant") //
-            .in(path.assistant().currentPage()).set(2) //
+            .in(path.assistant()::actions).set(new String[]{"print", "close", "save"}) //
+            .in(path.assistant()::title).set("MyAssistant") //
+            .in(path.assistant()::currentPage).set(2) //
 
-            .in(path.wantToClose()).set(false) //
-            .in(path.items()).set(PersonService.persons()) //
+            .in(path::wantToClose).set(false) //
+            .in(path::items).set(PersonService.persons()) //
 
-            .in(path.user().firstname()).set("Foo") //
-            .in(path.user().lastname()).set("Bar"));
+            .in(path.user()::firstname).set("Foo") //
+            .in(path.user()::lastname).set("Bar"));
 
         // TODO should/can the framework do this?
         reducers.add("startWaitingForAsync", (state, path, action) -> state //
-            .in(path.waitingForAsync()).set(true));
+            .in(path::waitingForAsync).set(true));
         reducers.add("stopWaitingForAsync", (state, path, action) -> state //
-            .in(path.waitingForAsync()).set(false));
+            .in(path::waitingForAsync).set(false));
 
         // assistant actions
         reducers.add("assistantAction/next", state -> path -> action -> state //
-            .in(path.assistant().currentPage()).update(page -> page + 1));
+            .in(path.assistant()::currentPage).update(page -> page + 1));
         reducers.add("assistantAction/previous", state -> path -> action -> state //
-            .in(path.assistant().currentPage()).update(page -> page - 1));
+            .in(path.assistant()::currentPage).update(page -> page - 1));
         reducers.add("assistantAction/close", state -> path -> action -> state //
-            .in(path.wantToClose()).set(true));
+            .in(path::wantToClose).set(true));
         // TODO casting is not really safe here, could be any action
         reducers.add("assistantAction/reallyPrint", (state, path, action) -> state //
-            .in(path.assistant().title()).set(((MySpecialAction) action).meta()));
+            .in(path.assistant()::title).set(((MySpecialAction) action).meta()));
 
         // dialog actions
         reducers.add("dialogAction/reallyClose", (state, path, action) -> state //
-            .in(path.wantToClose()).set(false) //
-            .in(path.assistant().title()).update(title -> title + " closed..."));
+            .in(path::wantToClose).set(false) //
+            .in(path.assistant()::title).update(title -> title + " closed..."));
 
         // table actions
         reducers.add("requestNewItems", (state, path, action) -> state //
-            .in(path.items()).update(items -> items.size() > 100
+            .in(path::items).update(items -> items.size() > 100
                 ? items
                 : items.addAll(PersonService.persons())));
 
@@ -70,7 +70,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         reducers.add(".*", (state, path, action) -> {
             System.out.println("we have no reducer for action: " + action.type());
             return state  //
-                .in(path.assistant().title()).update(title -> title + "!");
+                .in(path.assistant()::title).update(title -> title + "!");
         });
 
         // TODO allow state subset?

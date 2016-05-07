@@ -4,12 +4,12 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,13 +28,13 @@ public class ImmutableTest
     public void immutableWorks() throws Exception
     {
         immutable //
-            .in(path.title()).set("Test") //
-            .in(path.wantToClose()).set(true) //
+            .in(path::title).set("Test") //
+            .in(path::wantToClose).set(true) //
 
-            .in(path.pojo().wantToClose()).update(wantToClose -> !wantToClose) //
-            .in(path.title()).update(title -> title + "!");
+            .in(path.pojo()::wantToClose).update(wantToClose -> !wantToClose) //
+            .in(path::title).update(title -> title + "!");
 
-        immutable.in(path.currentPage()).update(page -> page + 1);
+        immutable.in(path::currentPage).update(page -> page + 1);
 
         // TODO offer a map set function?
         // immutable.in(path.myMap(), "key").set("value");
@@ -63,7 +63,7 @@ public class ImmutableTest
     public void set_changesBooleanValue() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path.wantToClose()).set(true);
+        final Immutable<POJO> newImmutable = immutable.in(path::wantToClose).set(true);
 
         // then
         assertThat(newImmutable.asObject().wantToClose(), is(true));
@@ -73,7 +73,7 @@ public class ImmutableTest
     public void update_changesBooleanValue() throws Exception
     {
         // given /  when
-        final Immutable<POJO> newImmutable = immutable.in(path.wantToClose()).update(value -> !value);
+        final Immutable<POJO> newImmutable = immutable.in(path::wantToClose).update(value -> !value);
 
         // then
         assertThat(newImmutable.asObject().wantToClose(), is(true));
@@ -83,7 +83,7 @@ public class ImmutableTest
     public void set_doesNotChangeCurrentObject() throws Exception
     {
         // given / when
-        immutable.in(path.wantToClose()).set(true);
+        immutable.in(path::wantToClose).set(true);
 
         // then
         assertThat(pojo.wantToClose(), is(false));
@@ -93,7 +93,7 @@ public class ImmutableTest
     public void set_returnsNewImmutable2() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path.wantToClose()).set(false);
+        final Immutable<POJO> newImmutable = immutable.in(path::wantToClose).set(false);
 
         // then
         assertThat(newImmutable, is(not(immutable)));
@@ -103,7 +103,7 @@ public class ImmutableTest
     public void set_returnsImmutable2_withSamePath() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path.wantToClose()).set(false);
+        final Immutable<POJO> newImmutable = immutable.in(path::wantToClose).set(false);
 
         // then
         assertThat(immutable.path(), is(newImmutable.path()));
@@ -113,7 +113,7 @@ public class ImmutableTest
     public void set_inNestedObject_changesBooleanValue() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path.pojo().wantToClose()).set(true);
+        final Immutable<POJO> newImmutable = immutable.in(path.pojo()::wantToClose).set(true);
 
         // then
         assertThat(newImmutable.asObject().wantToClose(), is(false));
@@ -131,13 +131,13 @@ public class ImmutableTest
     public void diff_returnsChanges() throws Exception
     {
         // given
-        final Immutable<POJO> newImmutable = immutable.in(path.pojo().wantToClose()).set(true);
+        final Immutable<POJO> newImmutable = immutable.in(path.pojo()::wantToClose).set(true);
 
         // TODO should you be able to pass a PathRecorder into constructor?
         // TODO -> one "unnecessary" variable: initialDiffImmutable
         final Immutable<POJO> initialDiffImmutable = new Immutable<>(POJO.class);
         final POJO diffPath = initialDiffImmutable.path();
-        final Immutable<POJO> diffImmutable = initialDiffImmutable.in(diffPath.pojo().wantToClose()).set(true);
+        final Immutable<POJO> diffImmutable = initialDiffImmutable.in(diffPath.pojo()::wantToClose).set(true);
 
         // when
         final Immutable<POJO> diff = immutable.diff(newImmutable);
@@ -154,7 +154,7 @@ public class ImmutableTest
         thrown.expectMessage("No path was recorded. Did you use the correct Immutable#path()?");
 
         // when
-        new Immutable<>(POJO.class).in(path.wantToClose()).set(true);
+        new Immutable<>(POJO.class).in(path::wantToClose).set(true);
     }
 
     @Test
@@ -172,9 +172,9 @@ public class ImmutableTest
     {
         // given / when
         final Immutable<POJO> newImmutable = immutable //
-            .in(path.name().firstname()).set("Foo") //
-            .in(path.name().lastname()).set("Bar") //
-            .in(path.name()).set(name("F", "B").asObject());
+            .in(path.name()::firstname).set("Foo") //
+            .in(path.name()::lastname).set("Bar") //
+            .in(path::name).set(name("F", "B").asObject());
 
         // then
         assertThat(newImmutable.asObject().name().firstname(), is("F"));
@@ -186,15 +186,16 @@ public class ImmutableTest
     {
         // given / when
         final Immutable<POJO> newImmutable = immutable  //
-            .in(path.name()).set(name("F", "B").asObject()) //
-            .in(path.name().firstname()).set("Foo");
+            .in(path::name).set(name("F", "B").asObject()) //
+            .in(path.name()::firstname).set("Foo");
 
         // then
         assertThat(newImmutable.asObject().name().firstname(), is("Foo"));
         assertThat(newImmutable.asObject().name().lastname(), is("B"));
     }
 
-    @Test
+    // TODO still relevant?
+    /*@Test
     public void setIn_setsInCorrectPath_whenPathIsUsedInAnotherThread() throws Exception
     {
         // given
@@ -209,13 +210,13 @@ public class ImmutableTest
         // then
         assertThat(newImmutable.asObject().name().firstname(), is("A"));
         assertThat(newImmutable.asObject().name().lastname(), is(nullValue()));
-    }
+    }*/
 
     @Test
     public void get_returnsCorrectList_whenImmutableListWasSet() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path.titles()).set(new ImmutableList<String>() //
+        final Immutable<POJO> newImmutable = immutable.in(path::titles).set(new ImmutableList<String>() //
             .add("foo").add("bar"));
 
         // then
@@ -226,7 +227,7 @@ public class ImmutableTest
     public void get_returnsCorrectList_whenListWasSet() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path.titles()).set(newArrayList("foo", "bar"));
+        final Immutable<POJO> newImmutable = immutable.in(path::titles).set(newArrayList("foo", "bar"));
 
         // then
         assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
@@ -236,7 +237,7 @@ public class ImmutableTest
     public void get_returnsUpdatedList_whenListWasUpdated() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path.titles()).updateList(list -> newArrayList("foo", "bar"));
+        final Immutable<POJO> newImmutable = immutable.in(path::titles).updateList(list -> newArrayList("foo", "bar"));
 
         // then
         assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
@@ -246,7 +247,7 @@ public class ImmutableTest
     public void get_returnsUpdatedList_whenImmutableListWasUpdated() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path.titles()).update(list -> list.add("foo").add("bar"));
+        final Immutable<POJO> newImmutable = immutable.in(path::titles).update(list -> list.add("foo").add("bar"));
 
         // then
         assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
@@ -256,7 +257,7 @@ public class ImmutableTest
     public void get_returnsClonedArray_whenMutableArrayWasSet() throws Exception
     {
         // given
-        final Immutable<POJO> newImmutable = immutable.in(path.titleArray()).set(new String[]{"foo", "bar"});
+        final Immutable<POJO> newImmutable = immutable.in(path::titleArray).set(new String[]{"foo", "bar"});
 
         // when
         newImmutable.asObject().titleArray()[1] = "baz";
@@ -270,7 +271,7 @@ public class ImmutableTest
     {
         // given
         final String[] array = {"foo", "bar"};
-        final Immutable<POJO> newImmutable = immutable.in(path.titleArray()).set(array);
+        final Immutable<POJO> newImmutable = immutable.in(path::titleArray).set(array);
 
         // when
         array[1] = "baz";
@@ -283,8 +284,8 @@ public class ImmutableTest
     public void diff_ofImmutablesWithEqualStringSet_shouldBeEmpty() throws Exception
     {
         // given
-        final Immutable<POJO> immutable1 = immutable.in(path.title()).set("foo");
-        final Immutable<POJO> immutable2 = immutable.in(path.title()).set("foo");
+        final Immutable<POJO> immutable1 = immutable.in(path::title).set("foo");
+        final Immutable<POJO> immutable2 = immutable.in(path::title).set("foo");
 
         // when
         final Immutable<POJO> diff = immutable1.diff(immutable2);
@@ -297,8 +298,8 @@ public class ImmutableTest
     public void diff_ofImmutablesWithEqualArrays_shouldBeEmpty() throws Exception
     {
         // given
-        final Immutable<POJO> immutable1 = immutable.in(path.titleArray()).set(new String[]{"foo", "bar"});
-        final Immutable<POJO> immutable2 = immutable.in(path.titleArray()).set(new String[]{"foo", "bar"});
+        final Immutable<POJO> immutable1 = immutable.in(path::titleArray).set(new String[]{"foo", "bar"});
+        final Immutable<POJO> immutable2 = immutable.in(path::titleArray).set(new String[]{"foo", "bar"});
 
         // when
         final Immutable<POJO> diff = immutable1.diff(immutable2);
@@ -319,8 +320,8 @@ public class ImmutableTest
         final Immutable<POJO.Name> immutable = new Immutable<>(POJO.Name.class);
         final POJO.Name path = immutable.path();
         return immutable //
-            .in(path.firstname()).set(firstname) //
-            .in(path.lastname()).set(lastname);
+            .in(path::firstname).set(firstname) //
+            .in(path::lastname).set(lastname);
     }
 
     private interface POJO
@@ -347,5 +348,8 @@ public class ImmutableTest
 
             String lastname();
         }
+    }
+    private interface ListSupplier extends Supplier<List<String>>
+    {
     }
 }

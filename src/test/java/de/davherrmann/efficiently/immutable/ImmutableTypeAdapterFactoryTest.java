@@ -32,7 +32,7 @@ public class ImmutableTypeAdapterFactoryTest
     {
         // when
         final Immutable<POJO> newImmutable = immutable //
-            .in(path.name().firstname()).set("Foo");
+            .in(path.name()::firstname).set("Foo");
 
         // then
         assertThat(gson.toJson(newImmutable), is("{\"name\":{\"firstname\":\"Foo\"}}"));
@@ -43,7 +43,7 @@ public class ImmutableTypeAdapterFactoryTest
     {
         // when
         final Immutable<POJO> newImmutable = immutable //
-            .in(path.name()).set(name("Foo", "Bar"));
+            .in(path::name).set(name("Foo", "Bar"));
 
         // then
         assertThat(gson.toJson(newImmutable), is("{\"name\":{\"firstname\":\"Foo\",\"lastname\":\"Bar\"}}"));
@@ -54,8 +54,8 @@ public class ImmutableTypeAdapterFactoryTest
     {
         // when
         final Immutable<POJO> newImmutable = immutable //
-            .in(path.name()).set(name("Foo", "Bar")) //
-            .in(path.name().lastname()).set("B");
+            .in(path::name).set(name("Foo", "Bar")) //
+            .in(path.name()::lastname).set("B");
 
         // then
         assertThat(gson.toJson(newImmutable), is("{\"name\":{\"firstname\":\"Foo\",\"lastname\":\"B\"}}"));
@@ -66,7 +66,7 @@ public class ImmutableTypeAdapterFactoryTest
     {
         // when
         final Immutable<POJO> newImmutable = immutable  //
-            .in(path.names()).set(newArrayList( //
+            .in(path::names).set(newArrayList( //
                 name("A", "AFoo").asObject(), //
                 name("B", "BFoo").asObject()));
 
@@ -81,8 +81,8 @@ public class ImmutableTypeAdapterFactoryTest
         final POJO.Name path = immutable.path();
 
         return immutable //
-            .in(path.firstname()).set(firstname) //
-            .in(path.lastname()).set(lastname);
+            .in(path::firstname).set(firstname) //
+            .in(path::lastname).set(lastname);
     }
 
     private interface POJO

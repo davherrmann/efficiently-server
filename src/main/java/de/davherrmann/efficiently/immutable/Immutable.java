@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.google.common.base.Defaults;
 import com.google.common.collect.ImmutableMap;
@@ -44,15 +45,18 @@ public class Immutable<I>
         return immutableFor(type, emptyList());
     }
 
-    public <T> In<T> in(T method)
+    public <T> In<T> in(Supplier<T> method)
     {
         // TODO can we rely on method as defaultValue?
-        return new In<>(getAndCheckLastPath(), method);
+        // TODO pass supplier to PathRecorder, synchronously call supplier and get path in PathRecorder!
+        final T defaultValue = method.get();
+        return new In<>(getAndCheckLastPath(), defaultValue);
     }
 
-    public <LT, T extends List<LT>> InList<LT> in(T method)
+    public <T> InList<T> in(ListSupplier<T> method)
     {
-        return new InList<>(getAndCheckLastPath(), method);
+        final List<T> defaultValue = method.get();
+        return new InList<>(getAndCheckLastPath(), defaultValue);
     }
 
     public Immutable<I> diff(Immutable<I> immutable)
