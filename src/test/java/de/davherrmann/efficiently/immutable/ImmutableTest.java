@@ -333,20 +333,6 @@ public class ImmutableTest
         assertThat(initialisedImmutable.asObject().titles(), is(newArrayList("Foo")));
     }
 
-    @Test
-    public void in_acceptsFunction_mappingPathToListSupplier() throws Exception
-    {
-        // given / when
-        new Immutable<>(POJO.class) //
-            .inList(path -> path::titles).update(list -> list.add("")) //
-            .inList(path -> path::titles).set(newArrayList()) //
-            .in(path -> path.name()::firstname).update(firstName -> firstName + "!") //
-            .inList(p -> p::titles).set(newArrayList());
-
-        // then
-
-    }
-
     private Immutable<POJO.Name> name(String firstname, String lastname)
     {
         final Immutable<POJO.Name> immutable = new Immutable<>(POJO.Name.class);

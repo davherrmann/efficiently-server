@@ -58,7 +58,6 @@ public class Immutable<I>
         return new In<>(getAndCheckLastPath(), defaultValue);
     }
 
-
     public <T> InList<T> inList(Function<I, Supplier<List<T>>> pathToMethod)
     {
         return inList(pathToMethod.apply(path()));
