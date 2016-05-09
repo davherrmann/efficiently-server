@@ -69,6 +69,18 @@ public class Immutable<I>
         return new InList<>(getAndCheckLastPath(), defaultValue);
     }
 
+    public <T> T get(Function<I, Supplier<T>> method)
+    {
+        return get(method.apply(path()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T get(Supplier<T> method)
+    {
+        method.get();
+        return (T) nextImmutable.getInPath(values, getAndCheckLastPath());
+    }
+
     public Immutable<I> diff(Immutable<I> immutable)
     {
         return new Immutable<>(type, nextImmutable.diff(values, immutable.values()), pathRecorder);

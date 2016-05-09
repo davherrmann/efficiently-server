@@ -313,7 +313,7 @@ public class ImmutableTest
     public void setIn_worksWithPathMapping() throws Exception
     {
         // given / when
-        final Immutable<POJO> initialisedImmutable = new Immutable<>(POJO.class) //
+        final Immutable<POJO> initialisedImmutable = immutable //
             .in(path -> path.pojo()::title) //
             .set("Foo");
 
@@ -325,7 +325,7 @@ public class ImmutableTest
     public void setInList_worksWithPathMapping() throws Exception
     {
         // given / when
-        final Immutable<POJO> initialisedImmutable = new Immutable<>(POJO.class) //
+        final Immutable<POJO> initialisedImmutable = immutable //
             .inList(path -> path::titles) //
             .set(newArrayList("Foo"));
 
@@ -333,13 +333,31 @@ public class ImmutableTest
         assertThat(initialisedImmutable.asObject().titles(), is(newArrayList("Foo")));
     }
 
+    @Test
+    public void get_returnsSetValue() throws Exception
+    {
+        // given
+        final Immutable<POJO> newImmutable = immutable.in(p -> p::title).set("Foo");
+
+        // when / then
+        assertThat(newImmutable.get(path::title), is("Foo"));
+    }
+
+    @Test
+    public void get_returnsSetValue_withPathMapping() throws Exception
+    {
+        // given
+        final Immutable<POJO> newImmutable = immutable.inList(p -> p::titles).update(l -> l.add("Foo"));
+
+        // when / then
+        assertThat(newImmutable.get(path -> path::titles), is(newArrayList("Foo")));
+    }
+
     private Immutable<POJO.Name> name(String firstname, String lastname)
     {
-        final Immutable<POJO.Name> immutable = new Immutable<>(POJO.Name.class);
-        final POJO.Name path = immutable.path();
-        return immutable //
-            .in(path::firstname).set(firstname) //
-            .in(path::lastname).set(lastname);
+        return new Immutable<>(POJO.Name.class) //
+            .in(p -> p::firstname).set(firstname) //
+            .in(p -> p::lastname).set(lastname);
     }
 
     private interface POJO
