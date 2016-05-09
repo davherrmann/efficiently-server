@@ -216,7 +216,7 @@ public class ImmutableTest
     public void get_returnsCorrectList_whenImmutableListWasSet() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path::titles).set(new ImmutableList<String>() //
+        final Immutable<POJO> newImmutable = immutable.inList(path::titles).set(new ImmutableList<String>() //
             .add("foo").add("bar"));
 
         // then
@@ -227,7 +227,7 @@ public class ImmutableTest
     public void get_returnsCorrectList_whenListWasSet() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path::titles).set(newArrayList("foo", "bar"));
+        final Immutable<POJO> newImmutable = immutable.inList(path::titles).set(newArrayList("foo", "bar"));
 
         // then
         assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
@@ -237,7 +237,8 @@ public class ImmutableTest
     public void get_returnsUpdatedList_whenListWasUpdated() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path::titles).updateList(list -> newArrayList("foo", "bar"));
+        final Immutable<POJO> newImmutable = immutable.inList(path::titles).updateList(
+            list -> newArrayList("foo", "bar"));
 
         // then
         assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
@@ -247,7 +248,7 @@ public class ImmutableTest
     public void get_returnsUpdatedList_whenImmutableListWasUpdated() throws Exception
     {
         // given / when
-        final Immutable<POJO> newImmutable = immutable.in(path::titles).update(list -> list.add("foo").add("bar"));
+        final Immutable<POJO> newImmutable = immutable.inList(path::titles).update(list -> list.add("foo").add("bar"));
 
         // then
         assertThat(newImmutable.asObject().titles(), is(newArrayList("foo", "bar")));
@@ -309,10 +310,41 @@ public class ImmutableTest
     }
 
     @Test
-    public void equals_forTwoArraysWithSameContent_isTrue() throws Exception
+    public void setIn_worksWithPathMapping() throws Exception
     {
-        // given / then
-        assertThat(Compare.areEqual(new String[]{"foo", "bar"}, new String[]{"foo", "bar"}), is(true));
+        // given / when
+        final Immutable<POJO> initialisedImmutable = new Immutable<>(POJO.class) //
+            .in(path -> path.pojo()::title) //
+            .set("Foo");
+
+        // then
+        assertThat(initialisedImmutable.asObject().pojo().title(), is("Foo"));
+    }
+
+    @Test
+    public void setInList_worksWithPathMapping() throws Exception
+    {
+        // given / when
+        final Immutable<POJO> initialisedImmutable = new Immutable<>(POJO.class) //
+            .inList(path -> path::titles) //
+            .set(newArrayList("Foo"));
+
+        // then
+        assertThat(initialisedImmutable.asObject().titles(), is(newArrayList("Foo")));
+    }
+
+    @Test
+    public void in_acceptsFunction_mappingPathToListSupplier() throws Exception
+    {
+        // given / when
+        new Immutable<>(POJO.class) //
+            .inList(path -> path::titles).update(list -> list.add("")) //
+            .inList(path -> path::titles).set(newArrayList()) //
+            .in(path -> path.name()::firstname).update(firstName -> firstName + "!") //
+            .inList(p -> p::titles).set(newArrayList());
+
+        // then
+
     }
 
     private Immutable<POJO.Name> name(String firstname, String lastname)

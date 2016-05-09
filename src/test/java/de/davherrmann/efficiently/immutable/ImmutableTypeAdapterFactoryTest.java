@@ -66,7 +66,7 @@ public class ImmutableTypeAdapterFactoryTest
     {
         // when
         final Immutable<POJO> newImmutable = immutable  //
-            .in(path::names).set(newArrayList( //
+            .inList(path::names).set(newArrayList( //
                 name("A", "AFoo").asObject(), //
                 name("B", "BFoo").asObject()));
 

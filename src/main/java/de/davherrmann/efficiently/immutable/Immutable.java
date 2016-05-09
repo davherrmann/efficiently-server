@@ -45,6 +45,11 @@ public class Immutable<I>
         return immutableFor(type, emptyList());
     }
 
+    public <T> In<T> in(Function<I, Supplier<T>> pathToMethod)
+    {
+        return in(pathToMethod.apply(path()));
+    }
+
     public <T> In<T> in(Supplier<T> method)
     {
         // TODO can we rely on method as defaultValue?
@@ -53,7 +58,13 @@ public class Immutable<I>
         return new In<>(getAndCheckLastPath(), defaultValue);
     }
 
-    public <T> InList<T> in(ListSupplier<T> method)
+
+    public <T> InList<T> inList(Function<I, Supplier<List<T>>> pathToMethod)
+    {
+        return inList(pathToMethod.apply(path()));
+    }
+
+    public <T> InList<T> inList(Supplier<List<T>> method)
     {
         final List<T> defaultValue = method.get();
         return new InList<>(getAndCheckLastPath(), defaultValue);

@@ -30,7 +30,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.assistant()::currentPage).set(2) //
 
             .in(path::wantToClose).set(false) //
-            .in(path::items).set(PersonService.persons()) //
+            .inList(path::items).set(PersonService.persons()) //
 
             .in(path.user()::firstname).set("Foo") //
             .in(path.user()::lastname).set("Bar"));
@@ -59,7 +59,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
         // table actions
         reducers.add("requestNewItems", (state, path, action) -> state //
-            .in(path::items).update(items -> items.size() > 100
+            .inList(path::items).update(items -> items.size() > 100
                 ? items
                 : items.addAll(PersonService.persons())));
 
