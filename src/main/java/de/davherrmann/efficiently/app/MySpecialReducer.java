@@ -8,7 +8,6 @@ import de.davherrmann.efficiently.immutable.Immutable;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;
-import de.davherrmann.efficiently.server.StandardAction;
 
 public class MySpecialReducer implements Reducer<MySpecialState>
 {
@@ -32,35 +31,22 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         reducers.add("changeLanguage/English", (state, path, action) -> addCaptionsTo(state, "English"));
 
         // possible states
-        reducers.add("setState/.*", (state, path, action) -> {
-            // TODO improve: casting necessary?
-            switch (((StandardAction) action).meta().get("name"))
-            {
-                case "firstPageEmpty":
-                    // TODO can't use path here! should we inject path into the Immutable? better UX?
-                    return resetState(state).in(path.assistant()::currentPage).set(0);
-                case "firstPageEmptyWaiting":
-                    return resetState(state) //
-                        .in(path.assistant()::currentPage).set(0) //
-                        .in(path::waitingForAsync).set(true);
-                case "secondPageEmpty":
-                    return resetState(state).in(p -> p.assistant()::currentPage).set(1);
-                case "thirdPageWithDialog":
-                    return resetState(state) //
-                        .in(path.assistant()::currentPage).set(2) //
-                        .in(path::wantToClose).set(true);
-                case "thirdPageWithDialogWaiting":
-                    return resetState(state) //
-                        .in(path.assistant()::currentPage).set(2) //
-                        .in(path::wantToClose).set(true) //
-                        .in(path::waitingForAsync).set(true);
-                case "English":
-                    return addCaptionsTo(state, "English");
-                case "German":
-                    return addCaptionsTo(state, "German");
-            }
-            return state;
-        });
+        reducers.add("setState/firstPageEmpty", (state, path, action) -> resetState(state) //
+            .in(path.assistant()::currentPage).set(0));
+        reducers.add("setState/firstPageEmptyWaiting", (state, path, action) -> resetState(state) //
+            .in(path.assistant()::currentPage).set(0) //
+            .in(path::waitingForAsync).set(true));
+        reducers.add("setState/secondPageEmpty", (state, path, action) -> resetState(state) //
+            .in(path.assistant()::currentPage).set(1));
+        reducers.add("setState/thirdPageWithDialog", (state, path, action) -> resetState(state) //
+            .in(path.assistant()::currentPage).set(0) //
+            .in(path::wantToClose).set(true));
+        reducers.add("setState/thirdPageWithDialogWaiting", (state, path, action) -> resetState(state) //
+            .in(path.assistant()::currentPage).set(0) //
+            .in(path::wantToClose).set(true) //
+            .in(path::waitingForAsync).set(true));
+        reducers.add("setState/English", (state, path, action) -> addCaptionsTo(state, "English"));
+        reducers.add("setState/German", (state, path, action) -> addCaptionsTo(state, "German"));
 
         // async start/stop
         // TODO should/can the framework do this?
