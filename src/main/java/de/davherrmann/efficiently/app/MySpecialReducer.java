@@ -39,10 +39,10 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         reducers.add("setState/secondPageEmpty", (state, path, action) -> resetState(state) //
             .in(path.assistant()::currentPage).set(1));
         reducers.add("setState/thirdPageWithDialog", (state, path, action) -> resetState(state) //
-            .in(path.assistant()::currentPage).set(0) //
+            .in(path.assistant()::currentPage).set(2) //
             .in(path::wantToClose).set(true));
         reducers.add("setState/thirdPageWithDialogWaiting", (state, path, action) -> resetState(state) //
-            .in(path.assistant()::currentPage).set(0) //
+            .in(path.assistant()::currentPage).set(2) //
             .in(path::wantToClose).set(true) //
             .in(path::waitingForAsync).set(true));
         reducers.add("setState/English", (state, path, action) -> addCaptionsTo(state, "English"));
