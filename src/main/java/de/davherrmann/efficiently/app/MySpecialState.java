@@ -4,6 +4,7 @@ import java.util.List;
 
 public interface MySpecialState
 {
+    List<PossibleState> possibleStates();
 
     EWB ewb();
 
@@ -15,7 +16,7 @@ public interface MySpecialState
 
     boolean waitingForAsync();
 
-    Form user();
+    Form form();
 
     interface EWB
     {
@@ -48,10 +49,19 @@ public interface MySpecialState
 
     interface Form
     {
+        String firstnameLabel();
+
         String firstname();
 
         String lastname();
 
         String email();
+    }
+
+    interface PossibleState
+    {
+        String name();
+
+        String title();
     }
 }

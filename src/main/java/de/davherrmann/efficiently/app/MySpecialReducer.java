@@ -1,9 +1,14 @@
 package de.davherrmann.efficiently.app;
 
+import static com.google.common.collect.Maps.newHashMap;
+
+import java.util.Map;
+
 import de.davherrmann.efficiently.immutable.Immutable;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;
+import de.davherrmann.efficiently.server.StandardAction;
 
 public class MySpecialReducer implements Reducer<MySpecialState>
 {
@@ -21,20 +26,43 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         // reducers.add("", state -> path -> action -> state.in(path.assistant()::title).set(""));
 
         // initialise state
-        reducers.add("initState", (state, path, action) -> state.clear() //
-            .in(path.ewb()::actions).set(new String[]{"print", "close", "save"}) //
-            .in(path.ewb()::title).set("MyEWB") //
+        reducers.add("initState", (state, path, action) -> resetState(state));
 
-            .in(path.assistant()::actions).set(new String[]{"print", "close", "save"}) //
-            .in(path.assistant()::title).set("MyAssistant") //
-            .in(path.assistant()::currentPage).set(2) //
+        reducers.add("changeLanguage/German", (state, path, action) -> addCaptionsTo(state, "German"));
+        reducers.add("changeLanguage/English", (state, path, action) -> addCaptionsTo(state, "English"));
 
-            .in(path::wantToClose).set(false) //
-            .inList(path::items).set(PersonService.persons()) //
+        // possible states
+        reducers.add("setState/.*", (state, path, action) -> {
+            // TODO improve: casting necessary?
+            switch (((StandardAction) action).meta().get("name"))
+            {
+                case "firstPageEmpty":
+                    // TODO can't use path here! should we inject path into the Immutable? better UX?
+                    return resetState(state).in(path.assistant()::currentPage).set(0);
+                case "firstPageEmptyWaiting":
+                    return resetState(state) //
+                        .in(path.assistant()::currentPage).set(0) //
+                        .in(path::waitingForAsync).set(true);
+                case "secondPageEmpty":
+                    return resetState(state).in(p -> p.assistant()::currentPage).set(1);
+                case "thirdPageWithDialog":
+                    return resetState(state) //
+                        .in(path.assistant()::currentPage).set(2) //
+                        .in(path::wantToClose).set(true);
+                case "thirdPageWithDialogWaiting":
+                    return resetState(state) //
+                        .in(path.assistant()::currentPage).set(2) //
+                        .in(path::wantToClose).set(true) //
+                        .in(path::waitingForAsync).set(true);
+                case "English":
+                    return addCaptionsTo(state, "English");
+                case "German":
+                    return addCaptionsTo(state, "German");
+            }
+            return state;
+        });
 
-            .in(path.user()::firstname).set("Foo") //
-            .in(path.user()::lastname).set("Bar"));
-
+        // async start/stop
         // TODO should/can the framework do this?
         reducers.add("startWaitingForAsync", (state, path, action) -> state //
             .in(path::waitingForAsync).set(true));
@@ -42,11 +70,11 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path::waitingForAsync).set(false));
 
         // assistant actions
-        reducers.add("assistantAction/next", state -> path -> action -> state //
+        reducers.add("assistantAction/next", (state, path, action) -> state //
             .in(path.assistant()::currentPage).update(page -> page + 1));
-        reducers.add("assistantAction/previous", state -> path -> action -> state //
+        reducers.add("assistantAction/previous", (state, path, action) -> state //
             .in(path.assistant()::currentPage).update(page -> page - 1));
-        reducers.add("assistantAction/close", state -> path -> action -> state //
+        reducers.add("assistantAction/close", (state, path, action) -> state //
             .in(path::wantToClose).set(true));
         // TODO casting is not really safe here, could be any action
         reducers.add("assistantAction/reallyPrint", (state, path, action) -> state //
@@ -82,6 +110,65 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         // Allow function annotations?
         // @Action("assistantAction/next")
         //actionReducerMap.putAll(AnnotatedActionReducers.from(this));
+    }
+
+    private Immutable<MySpecialState> resetState(Immutable<MySpecialState> state)
+    {
+        final MySpecialState path = state.path();
+        final Immutable<MySpecialState> initialState = state.clear() //
+            .in(path.ewb()::actions).set(new String[]{"print", "close", "save"}) //
+            .in(path.ewb()::title).set("MyEWB") //
+
+            .in(path.assistant()::actions).set(new String[]{"print", "close", "save"}) //
+            .in(path.assistant()::title).set("MyAssistant") //
+            .in(path.assistant()::currentPage).set(2) //
+
+            .in(path::wantToClose).set(false) //
+            .inList(path::items).set(PersonService.persons()) //
+
+            .in(path.form()::firstname).set("Foo") //
+            .in(path.form()::lastname).set("Bar") //
+            .in(path.form()::firstnameLabel).set("First Name FOo") //
+
+            .inList(path::possibleStates).update(list -> list //
+                .add(possibleState("firstPageEmpty", "Seite 1 leer")) //
+                .add(possibleState("firstPageEmptyWaiting", "Seite 1 leer wartend")) //
+                .add(possibleState("secondPageEmpty", "Seite 2 leer")) //
+                .add(possibleState("thirdPageWithDialog", "Seite 3 mit Dialog")) //
+                .add(possibleState("thirdPageWithDialogWaiting", "Seite 3 mit Dialog wartend")) //
+                .add(possibleState("German", "Deutsch")) //
+                .add(possibleState("English", "Englisch")) //
+            );
+        return addCaptionsTo(initialState, "German");
+    }
+
+    private Immutable<MySpecialState> addCaptionsTo(Immutable<MySpecialState> state, String language)
+    {
+        return state //
+            .in(p -> p.assistant()::title).set(captionFor("Deutscher Titel", language)) //
+            .in(p -> p.form()::firstnameLabel).set(captionFor("Vorname", language));
+    }
+
+    private String captionFor(String fromString, String language)
+    {
+        if ("German".equals(language))
+        {
+            return fromString;
+        }
+
+        Map<String, String> translation = newHashMap();
+        translation.put("Deutscher Titel", "English Title");
+        translation.put("Vorname", "First Name");
+
+        return translation.getOrDefault(fromString, "NO TRANSLATION");
+    }
+
+    private MySpecialState.PossibleState possibleState(final String name, String title)
+    {
+        return new Immutable<>(MySpecialState.PossibleState.class) //
+            .in(path -> path::name).set(name) //
+            .in(path -> path::title).set(title) //
+            .asObject();
     }
 
     @Override

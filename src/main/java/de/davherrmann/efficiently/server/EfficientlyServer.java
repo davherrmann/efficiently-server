@@ -21,10 +21,6 @@ import de.davherrmann.efficiently.immutable.Immutable;
 @EnableAutoConfiguration
 public class EfficientlyServer implements Dispatcher
 {
-    // TODO dependency injection
-    private final MySpecialReducer reducer = new MySpecialReducer();
-    private AsyncDispatcher asyncDispatcher = new AsyncDispatcher();
-
     private final Gson gson = new Gson();
 
     // TODO Optionals?
@@ -48,8 +44,9 @@ public class EfficientlyServer implements Dispatcher
     {
         System.out.println("dispatching action: " + action.type());
 
-        asyncDispatcher.dispatch(this, action);
-        state = reducer.reduce(state, state.path(), action);
+        // TODO dependency injection
+        new AsyncDispatcher().dispatch(this, action);
+        state = new MySpecialReducer().reduce(state, state.path(), action);
     }
 
     public static void main(String[] args) throws Exception

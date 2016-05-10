@@ -26,6 +26,7 @@ public class AsyncDispatcher
                 }, //
                 2, //
                 TimeUnit.SECONDS);
+            // TODO no boolean, but counter (several threads)
             syncDispatcher.dispatch(waitingForAsyncAction(true));
         }
     }
