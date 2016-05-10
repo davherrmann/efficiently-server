@@ -6,6 +6,7 @@ import static java.util.Collections.emptyList;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.validation.constraints.NotNull;
 
@@ -35,9 +36,20 @@ public class PathRecorder<I>
     }
 
     @NotNull
-    public List<String> lastCalledPath()
+    public List<String> pathFor(Supplier<?> method)
     {
-        return this.lastPath.get();
+        this.lastPath.set(ImmutableList.of());
+
+        method.get();
+
+        final List<String> path = this.lastPath.get();
+
+        if (path.isEmpty())
+        {
+            throw new IllegalStateException("No path was recorded. Did you use the correct Immutable#path()?");
+        }
+
+        return path;
     }
 
     @SuppressWarnings("unchecked")

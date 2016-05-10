@@ -53,9 +53,8 @@ public class Immutable<I>
     public <T> In<T> in(Supplier<T> method)
     {
         // TODO can we rely on method as defaultValue?
-        // TODO pass supplier to PathRecorder, synchronously call supplier and get path in PathRecorder!
         final T defaultValue = method.get();
-        return new In<>(getAndCheckLastPath(), defaultValue);
+        return new In<>(pathRecorder.pathFor(method), defaultValue);
     }
 
     public <T> InList<T> inList(Function<I, Supplier<List<T>>> pathToMethod)
@@ -66,7 +65,7 @@ public class Immutable<I>
     public <T> InList<T> inList(Supplier<List<T>> method)
     {
         final List<T> defaultValue = method.get();
-        return new InList<>(getAndCheckLastPath(), defaultValue);
+        return new InList<>(pathRecorder.pathFor(method), defaultValue);
     }
 
     public <T> T get(Function<I, Supplier<T>> method)
@@ -77,8 +76,7 @@ public class Immutable<I>
     @SuppressWarnings("unchecked")
     public <T> T get(Supplier<T> method)
     {
-        method.get();
-        return (T) nextImmutable.getInPath(values, getAndCheckLastPath());
+        return (T) nextImmutable.getInPath(values, pathRecorder.pathFor(method));
     }
 
     public Immutable<I> diff(Immutable<I> immutable)
@@ -217,18 +215,6 @@ public class Immutable<I>
             new Class[]{type, ImmutableNode.class}, //
             new ImmutableObjectInvocationHandler(nestedPath) //
         );
-    }
-
-    private List<String> getAndCheckLastPath()
-    {
-        final List<String> path = pathRecorder.lastCalledPath();
-
-        if (path.isEmpty())
-        {
-            throw new IllegalStateException("No path was recorded. Did you use the correct Immutable#path()?");
-        }
-
-        return path;
     }
 
     private class ImmutableObjectInvocationHandler extends AbstractPathInvocationHandler
