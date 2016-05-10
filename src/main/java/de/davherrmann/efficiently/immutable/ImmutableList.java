@@ -21,7 +21,7 @@ public class ImmutableList<I>
 
     // TODO add(Immutable<I> immutableItem) & addAll(ImmutableList<I> immutableItems)?
 
-    ImmutableList<I> add(I item)
+    public ImmutableList<I> add(I item)
     {
         return new ImmutableList<>(com.google.common.collect.ImmutableList.<I>builder() //
             .addAll(values) //
