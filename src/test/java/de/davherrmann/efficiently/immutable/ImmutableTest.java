@@ -41,6 +41,12 @@ public class ImmutableTest
 
         // TODO offer a merge function?
 
+        // TODO set and update without in?
+        // immutable.set(path::currentPage, 0);
+        // immutable.update(path::currentPage, page -> page + 1);
+        // immutable.setList(path::list, list);
+        // immutable.updateList(path::list, list -> list.add(""));
+
         // then
         final POJO changedPOJO = immutable.asObject();
     }
