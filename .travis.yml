@@ -8,3 +8,6 @@ addons:
   apt:
     packages:
       oracle-java8-installer
+
+after_success:
+  - mvn clean test jacoco:report coveralls:report
