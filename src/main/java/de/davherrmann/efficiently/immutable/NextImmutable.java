@@ -8,6 +8,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -41,10 +42,10 @@ public class NextImmutable
     public Map<String, Object> merge(final Map<String, Object> dataStructure, final Map<String, Object> changes)
     {
         return ImmutableMap.copyOf(Stream.of(dataStructure, changes) //
-            .map(m -> m.entrySet()) //
+            .map(Map::entrySet) //
             .flatMap(Collection::stream) //
             .collect(toMap( //
-                e -> e.getKey(), //
+                Entry::getKey, //
                 e -> defensiveCopyOf(e.getValue()), //
                 (oldValue, newValue) -> isDataStructure(oldValue) && isDataStructure(newValue)
                     ? merge(dataStructure(oldValue), dataStructure(newValue))
@@ -54,7 +55,7 @@ public class NextImmutable
     public Map<String, Object> diff(Map<String, Object> dataStructure0, Map<String, Object> dataStructure1)
     {
         return Stream.of(dataStructure1) //
-            .map(m -> m.entrySet()) //
+            .map(Map::entrySet) //
             .flatMap(Collection::stream) //
             .filter(e -> !areEqual(e.getValue(), dataStructure0.get(e.getKey()))) //
             .map(e -> {
@@ -65,7 +66,7 @@ public class NextImmutable
                     ? new SimpleEntry<>(key, diff(dataStructure(oldValue), dataStructure(newValue)))
                     : e;
             }) //
-            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .collect(toMap(Entry::getKey, Entry::getValue));
     }
 
     private Map<String, Object> changeForSinglePath(final List<String> path, final Object value)
