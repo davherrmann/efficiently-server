@@ -13,6 +13,9 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 {
     private final Reducers<MySpecialState> reducers = new Reducers<>();
 
+    // TODO one central path recorder per type?
+    // private final MySpecialState path = PathRecorder.instanceFor(MySpecialState.class);
+
     public MySpecialReducer()
     {
         // TODO show asynchronous service call
