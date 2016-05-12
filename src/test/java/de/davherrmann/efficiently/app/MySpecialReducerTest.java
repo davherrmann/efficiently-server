@@ -5,7 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import de.davherrmann.efficiently.immutable.Immutable;
+import de.davherrmann.immutable.Immutable;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.StandardAction;
 

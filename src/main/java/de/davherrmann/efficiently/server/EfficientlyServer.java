@@ -14,7 +14,7 @@ import com.google.gson.Gson;
 import de.davherrmann.efficiently.app.AsyncDispatcher;
 import de.davherrmann.efficiently.app.MySpecialReducer;
 import de.davherrmann.efficiently.app.MySpecialState;
-import de.davherrmann.efficiently.immutable.Immutable;
+import de.davherrmann.immutable.Immutable;
 
 @RestController
 @ComponentScan

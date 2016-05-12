@@ -4,7 +4,7 @@ import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.Map;
 
-import de.davherrmann.efficiently.immutable.Immutable;
+import de.davherrmann.immutable.Immutable;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;

@@ -4,7 +4,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import de.davherrmann.efficiently.immutable.Immutable;
+import de.davherrmann.immutable.Immutable;
 
 public class PersonService
 {

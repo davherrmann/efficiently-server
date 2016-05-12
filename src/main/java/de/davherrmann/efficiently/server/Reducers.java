@@ -5,7 +5,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import de.davherrmann.efficiently.immutable.Immutable;
+import de.davherrmann.immutable.Immutable;
 
 public class Reducers<S> implements Reducer<S>
 {

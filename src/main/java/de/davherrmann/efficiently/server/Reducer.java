@@ -1,6 +1,6 @@
 package de.davherrmann.efficiently.server;
 
-import de.davherrmann.efficiently.immutable.Immutable;
+import de.davherrmann.immutable.Immutable;
 
 public interface Reducer<T>
 {
