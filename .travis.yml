@@ -9,10 +9,5 @@ addons:
     packages:
       oracle-java8-installer
 
-before_install:
-  - git clone https://github.com/davherrmann/immutable.git
-  - cd immutable
-  - mvn clean install
-
 after_success:
   - mvn clean test jacoco:report coveralls:report
