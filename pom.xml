@@ -76,7 +76,7 @@
 		<dependency>
 			<groupId>de.davherrmann.immutable</groupId>
 			<artifactId>immutable</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<version>0.1.4</version>
 		</dependency>
 
 		<!-- test -->
