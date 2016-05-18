@@ -49,6 +49,8 @@ public interface MySpecialState
 
     interface Form
     {
+        // TODO explicitly mark versioned/client side/controlled input state?
+        // @Versioned
         String firstnameLabel();
 
         String firstname();
