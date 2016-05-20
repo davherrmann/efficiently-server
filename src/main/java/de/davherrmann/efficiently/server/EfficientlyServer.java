@@ -21,8 +21,6 @@ import de.davherrmann.immutable.Immutable;
 @EnableAutoConfiguration
 public class EfficientlyServer implements Dispatcher
 {
-    private final Gson gson = new Gson();
-
     // TODO Optionals?
     private Immutable<MySpecialState> lastSentState = new Immutable<>(MySpecialState.class);
     private Immutable<MySpecialState> state = new Immutable<>(MySpecialState.class);
@@ -31,12 +29,34 @@ public class EfficientlyServer implements Dispatcher
     @RequestMapping(value = "/", method = {RequestMethod.POST})
     String reduce(@RequestBody final String json)
     {
-        dispatch(gson.fromJson(json, StandardAction.class));
+        System.out.println("raw data: " + json);
+
+        final Gson gson = new Gson();
+        final ClientData clientData = gson.fromJson(json, ClientData.class);
+
+        // 1. merge client side state
+        state = state.merge(clientData.clientStateDiff());
+
+        // TODO find cleaner way of this!
+        if ("initState".equals(clientData.action().type()))
+        {
+            lastSentState = new Immutable<>(MySpecialState.class);
+        }
+
+        // 2. possible asynchronous actions
+        // 3. reduce
+        dispatch(clientData.action());
+
+        // 4. calc diff
         final Immutable<MySpecialState> diff = lastSentState.diff(state);
         System.out.println("state diff: " + gson.toJson(diff));
+
+        // 5. save last sent state
         lastSentState = state;
+
+        // 6. send diff to client
         // TODO we could send the diff here! client side handling!
-        return gson.toJson(lastSentState);
+        return gson.toJson(diff);
     }
 
     @Override
@@ -45,6 +65,7 @@ public class EfficientlyServer implements Dispatcher
         System.out.println("dispatching action: " + action.type());
 
         // TODO dependency injection
+        // TODO should an asynchronous action callback be able to call asynchronous actions again?!?
         new AsyncDispatcher().dispatch(this, action);
         state = new MySpecialReducer().reduce(state, state.path(), action);
     }

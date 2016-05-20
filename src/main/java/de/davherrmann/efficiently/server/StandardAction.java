@@ -6,8 +6,18 @@ import com.google.common.collect.ImmutableMap;
 
 public class StandardAction implements Action<Map<String, String>>
 {
-    private String type = "";
+    private String type;
     private Map<String, String> meta = ImmutableMap.of();
+
+    public StandardAction()
+    {
+        this("");
+    }
+
+    public StandardAction(final String type)
+    {
+        this.type = type;
+    }
 
     public String type()
     {

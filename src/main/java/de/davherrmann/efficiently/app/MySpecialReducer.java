@@ -4,10 +4,10 @@ import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.Map;
 
-import de.davherrmann.immutable.Immutable;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;
+import de.davherrmann.immutable.Immutable;
 
 public class MySpecialReducer implements Reducer<MySpecialState>
 {
@@ -72,7 +72,9 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         // dialog actions
         reducers.add("dialogAction/reallyClose", (state, path, action) -> state //
             .in(path::wantToClose).set(false) //
-            .in(path.assistant()::title).update(title -> title + " closed..."));
+            .in(path.assistant()::title).update(title -> title + " closed...") //
+            .in(path.assistant()::title).set(state.get(path.user()::firstname) + " was selected.") //
+            .in(path.user()::firstname).set("FooUser"));
 
         // table actions
         reducers.add("requestNewItems", (state, path, action) -> state //
@@ -110,7 +112,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
             .in(path.assistant()::actions).set(new String[]{"print", "close", "save"}) //
             .in(path.assistant()::title).set("MyAssistant") //
-            .in(path.assistant()::currentPage).set(2) //
+            .in(path.assistant()::currentPage).set(0) //
 
             .in(path::wantToClose).set(false) //
             .inList(path::items).set(PersonService.persons()) //

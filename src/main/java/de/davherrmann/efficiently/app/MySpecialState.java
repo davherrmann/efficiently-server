@@ -18,6 +18,8 @@ public interface MySpecialState
 
     Form form();
 
+    Item user();
+
     interface EWB
     {
         String[] actions();
