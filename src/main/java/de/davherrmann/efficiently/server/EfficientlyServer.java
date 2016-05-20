@@ -37,7 +37,7 @@ public class EfficientlyServer implements Dispatcher
         // 1. merge client side state
         state = state.merge(clientData.clientStateDiff());
 
-        // TODO find cleaner way of this!
+        // TODO find cleaner way of doing this!
         if ("initState".equals(clientData.action().type()))
         {
             lastSentState = new Immutable<>(MySpecialState.class);
@@ -55,7 +55,6 @@ public class EfficientlyServer implements Dispatcher
         lastSentState = state;
 
         // 6. send diff to client
-        // TODO we could send the diff here! client side handling!
         return gson.toJson(diff);
     }
 

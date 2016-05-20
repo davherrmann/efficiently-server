@@ -18,14 +18,8 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
     public MySpecialReducer()
     {
-        // TODO show asynchronous service call
-
         // TODO custom action types?
         // reducers.add("assistantAction/reallyPrint", MySpecialAction.class, (state, path, action) -> state);
-
-        // TODO could we use method references in path?
-        // careful: type erasure -> Supplier == Supplier -> no difference between List<T> and T
-        // reducers.add("", state -> path -> action -> state.in(path.assistant()::title).set(""));
 
         // initialise state
         reducers.add("initState", (state, path, action) -> resetState(state));
