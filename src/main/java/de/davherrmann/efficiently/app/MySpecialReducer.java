@@ -107,6 +107,8 @@ public class MySpecialReducer implements Reducer<MySpecialState>
     {
         final MySpecialState path = state.path();
         final Immutable<MySpecialState> initialState = state.clear() //
+            .in(path::waitingForAsync).set(false) //
+
             .in(path.ewb()::actions).set(new String[]{"print", "close", "save"}) //
             .in(path.ewb()::title).set("MyEWB") //
 
