@@ -5,9 +5,9 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import de.davherrmann.immutable.Immutable;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.StandardAction;
+import de.davherrmann.immutable.Immutable;
 
 public class MySpecialReducerTest
 {
@@ -18,7 +18,7 @@ public class MySpecialReducerTest
     public void initialState() throws Exception
     {
         // given / then
-        assertThat(initialState.asObject().assistant().currentPage(), is(2));
+        assertThat(initialState.asObject().assistant().currentPage(), is(0));
     }
 
     @Test
@@ -29,7 +29,8 @@ public class MySpecialReducerTest
             action("assistantAction/next"));
 
         // then
-        assertThat(state.asObject().assistant().currentPage(), is(3));
+        assertThat(state.asObject().assistant().currentPage(),
+            is(initialState.asObject().assistant().currentPage() + 1));
     }
 
     private Action action(final String type)
