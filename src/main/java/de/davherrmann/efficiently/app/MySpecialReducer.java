@@ -115,6 +115,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.assistant()::currentPage).set(0) //
 
             .in(path::wantToClose).set(false) //
+            .in(path::waitingForAsync).set(false) //
             .inList(path::items).set(PersonService.persons()) //
 
             .in(path.form()::firstname).set("Foo") //
