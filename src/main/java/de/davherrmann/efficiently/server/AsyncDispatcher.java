@@ -11,7 +11,7 @@ public abstract class AsyncDispatcher
         new Thread(() -> {
             target.run();
             syncDispatcher.dispatch(waitingForAsyncAction(false));
-        });
+        }).start();
         // TODO no boolean, but counter (several threads) -> use update(x -> x + 1) in reducer
         syncDispatcher.dispatch(waitingForAsyncAction(true));
     }
