@@ -1,7 +1,6 @@
 package de.davherrmann.efficiently.app;
 
 import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
-import static de.davherrmann.efficiently.server.Actions.waitingForAsyncAction;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import javax.inject.Named;
@@ -12,7 +11,7 @@ import de.davherrmann.efficiently.server.Dispatcher;
 import de.davherrmann.efficiently.server.StandardAction;
 
 @Named
-public class MyAsyncDispatcher implements AsyncDispatcher
+public class MyAsyncDispatcher extends AsyncDispatcher
 {
     // TODO use async dispatcher to change input values via an explicit event?
     // TODO question: why not change input value state in reducer?
@@ -23,19 +22,18 @@ public class MyAsyncDispatcher implements AsyncDispatcher
 
     // TODO api: return true if waiting for async action, return false if not? or dispatch: "waiting for async"?
     @Override
-    public void dispatch(Dispatcher syncDispatcher, Action<?> action)
+    public void dispatch(final Dispatcher syncDispatcher, final Action<?> action)
     {
         // TODO show best practice for testing synchronously (possibly with futures?)
         if (action.type().equals("assistantAction/print"))
         {
-            new Thread(() -> {
+            // TODO always call execute? or can the framework call dispatch asynchronously?
+            // disadvantage: we could not dispatch a synchronous action here!
+            execute(syncDispatcher, () -> {
                 // simulate long lasting service call
                 sleepUninterruptibly(2, SECONDS);
                 syncDispatcher.dispatch(new StandardAction("assistantAction/reallyPrint"));
-                syncDispatcher.dispatch(waitingForAsyncAction(false));
             });
-            // TODO no boolean, but counter (several threads) -> use update(x -> x + 1) in reducer
-            syncDispatcher.dispatch(waitingForAsyncAction(true));
         }
     }
 }
