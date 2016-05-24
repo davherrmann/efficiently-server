@@ -9,6 +9,7 @@ import javax.inject.Named;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.AsyncDispatcher;
 import de.davherrmann.efficiently.server.Dispatcher;
+import de.davherrmann.efficiently.server.StandardAction;
 
 @Named
 public class MyAsyncDispatcher implements AsyncDispatcher
@@ -28,8 +29,9 @@ public class MyAsyncDispatcher implements AsyncDispatcher
         if (action.type().equals("assistantAction/print"))
         {
             new Thread(() -> {
+                // simulate long lasting service call
                 sleepUninterruptibly(2, SECONDS);
-                syncDispatcher.dispatch(new MySpecialAction());
+                syncDispatcher.dispatch(new StandardAction("assistantAction/reallyPrint"));
                 syncDispatcher.dispatch(waitingForAsyncAction(false));
             });
             // TODO no boolean, but counter (several threads) -> use update(x -> x + 1) in reducer

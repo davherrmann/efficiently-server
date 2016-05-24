@@ -64,7 +64,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path::wantToClose).set(true));
         // TODO casting is not really safe here, could be any action
         reducers.add("assistantAction/reallyPrint", (state, action) -> state //
-            .in(path.assistant()::title).set(((MySpecialAction) action).meta()));
+            .in(path.assistant()::title).set(action.meta().toString()));
 
         // dialog actions
         reducers.add("dialogAction/reallyClose", (state, action) -> state //
