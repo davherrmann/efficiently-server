@@ -5,11 +5,15 @@ import static java.util.concurrent.Executors.newScheduledThreadPool;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Named;
+
 import de.davherrmann.efficiently.server.Action;
+import de.davherrmann.efficiently.server.AsyncDispatcher;
 import de.davherrmann.efficiently.server.Dispatcher;
 import de.davherrmann.efficiently.server.StandardAction;
 
-public class AsyncDispatcher
+@Named
+public class MyAsyncDispatcher implements AsyncDispatcher
 {
     private final ScheduledExecutorService executorService = newScheduledThreadPool(1);
 
@@ -21,6 +25,7 @@ public class AsyncDispatcher
     // -> async dispatcher dispatches ACTION_SET_FORM_VALUE("form_X.user.name", "Foo")
 
     // TODO api: return true if waiting for async action, return false if not? or dispatch: "waiting for async"?
+    @Override
     public void dispatch(Dispatcher syncDispatcher, Action<?> action)
     {
         // TODO show best practice for testing synchronously (possibly with futures?)

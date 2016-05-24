@@ -5,18 +5,22 @@ import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 
 import java.util.Map;
 
+import javax.inject.Named;
+
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;
 import de.davherrmann.immutable.Immutable;
 
+@Named
 public class MySpecialReducer implements Reducer<MySpecialState>
 {
     private final Reducers<MySpecialState> reducers = new Reducers<>();
-    private final MySpecialState path = pathInstanceFor(MySpecialState.class);
 
     public MySpecialReducer()
     {
+        final MySpecialState path = pathInstanceFor(MySpecialState.class);
+
         // TODO custom action types?
         // reducers.add("assistantAction/reallyPrint", MySpecialAction.class, (state, path, action) -> state);
 
@@ -98,6 +102,8 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
     private Immutable<MySpecialState> resetState(Immutable<MySpecialState> state)
     {
+        final MySpecialState path = pathInstanceFor(MySpecialState.class);
+
         final Immutable<MySpecialState> initialState = state.clear() //
             .in(path::waitingForAsync).set(false) //
 
