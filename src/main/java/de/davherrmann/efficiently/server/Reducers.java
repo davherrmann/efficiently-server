@@ -22,6 +22,7 @@ public class Reducers<S> implements Reducer<S>
         return reducers.stream() //
             .filter(r -> r.pattern().matcher(action.type()).matches()) //
             .map(r -> r.reducer().reduce(state, action)) //
+            // TODO chain? or findFirst before map?
             .findFirst() //
             .orElse(state);
     }
