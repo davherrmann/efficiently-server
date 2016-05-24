@@ -26,13 +26,6 @@ public class Efficiently implements Dispatcher
         // 1. merge client side state
         state = state.merge(clientData.clientStateDiff());
 
-        // TODO find cleaner way of doing this!
-        // problem: open page, initState, refresh page, initState
-        if ("initState".equals(clientData.action().type()))
-        {
-            lastSentState = new Immutable<>(MySpecialState.class);
-        }
-
         // 2. possible asynchronous actions
         // 3. reduce
         dispatch(clientData.action());
@@ -45,6 +38,11 @@ public class Efficiently implements Dispatcher
         lastSentState = state;
 
         return diff;
+    }
+
+    public void reset()
+    {
+        lastSentState = new Immutable<>(MySpecialState.class);
     }
 
     @Override
