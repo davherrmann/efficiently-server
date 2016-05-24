@@ -67,7 +67,7 @@ public class EfficientlyServer implements Dispatcher
         // TODO dependency injection
         // TODO should an asynchronous action callback be able to call asynchronous actions again?!?
         new AsyncDispatcher().dispatch(this, action);
-        state = new MySpecialReducer().reduce(state, state.path(), action);
+        state = new MySpecialReducer().reduce(state, action);
     }
 
     public static void main(String[] args) throws Exception

@@ -17,11 +17,11 @@ public class Reducers<S> implements Reducer<S>
     }
 
     @Override
-    public Immutable<S> reduce(Immutable<S> state, S path, Action<?> action)
+    public Immutable<S> reduce(Immutable<S> state, Action<?> action)
     {
         return reducers.stream() //
             .filter(r -> r.pattern().matcher(action.type()).matches()) //
-            .map(r -> r.reducer().reduce(state, path, action)) //
+            .map(r -> r.reducer().reduce(state, action)) //
             .findFirst() //
             .orElse(state);
     }

@@ -13,7 +13,7 @@ public class MySpecialReducerTest
 {
     private final Immutable<MySpecialState> emptyState = new Immutable<>(MySpecialState.class);
     private final MySpecialReducer reducer = new MySpecialReducer();
-    private Immutable<MySpecialState> initialState = reducer.reduce(emptyState, emptyState.path(), action("initState"));
+    private Immutable<MySpecialState> initialState = reducer.reduce(emptyState, action("initState"));
     @Test
     public void initialState() throws Exception
     {
@@ -25,8 +25,7 @@ public class MySpecialReducerTest
     public void nextPage() throws Exception
     {
         // given / when
-        final Immutable<MySpecialState> state = reducer.reduce(initialState, initialState.path(),
-            action("assistantAction/next"));
+        final Immutable<MySpecialState> state = reducer.reduce(initialState, action("assistantAction/next"));
 
         // then
         assertThat(state.asObject().assistant().currentPage(),

@@ -1,6 +1,7 @@
 package de.davherrmann.efficiently.app;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 
 import java.util.Map;
 
@@ -12,9 +13,7 @@ import de.davherrmann.immutable.Immutable;
 public class MySpecialReducer implements Reducer<MySpecialState>
 {
     private final Reducers<MySpecialState> reducers = new Reducers<>();
-
-    // TODO one central path recorder per type?
-    // private final MySpecialState path = PathRecorder.instanceFor(MySpecialState.class);
+    private final MySpecialState path = pathInstanceFor(MySpecialState.class);
 
     public MySpecialReducer()
     {
@@ -28,56 +27,56 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         // reducers.add("", state -> path -> action -> state.in(path.assistant()::title).set(""));
 
         // initialise state
-        reducers.add("initState", (state, path, action) -> resetState(state));
+        reducers.add("initState", (state, action) -> resetState(state));
 
-        reducers.add("changeLanguage/German", (state, path, action) -> addCaptionsTo(state, "German"));
-        reducers.add("changeLanguage/English", (state, path, action) -> addCaptionsTo(state, "English"));
+        reducers.add("changeLanguage/German", (state, action) -> addCaptionsTo(state, "German"));
+        reducers.add("changeLanguage/English", (state, action) -> addCaptionsTo(state, "English"));
 
         // possible states
-        reducers.add("setState/firstPageEmpty", (state, path, action) -> resetState(state) //
+        reducers.add("setState/firstPageEmpty", (state, action) -> resetState(state) //
             .in(path.assistant()::currentPage).set(0));
-        reducers.add("setState/firstPageEmptyWaiting", (state, path, action) -> resetState(state) //
+        reducers.add("setState/firstPageEmptyWaiting", (state, action) -> resetState(state) //
             .in(path.assistant()::currentPage).set(0) //
             .in(path::waitingForAsync).set(true));
-        reducers.add("setState/secondPageEmpty", (state, path, action) -> resetState(state) //
+        reducers.add("setState/secondPageEmpty", (state, action) -> resetState(state) //
             .in(path.assistant()::currentPage).set(1));
-        reducers.add("setState/thirdPageWithDialog", (state, path, action) -> resetState(state) //
+        reducers.add("setState/thirdPageWithDialog", (state, action) -> resetState(state) //
             .in(path.assistant()::currentPage).set(2) //
             .in(path::wantToClose).set(true));
-        reducers.add("setState/thirdPageWithDialogWaiting", (state, path, action) -> resetState(state) //
+        reducers.add("setState/thirdPageWithDialogWaiting", (state, action) -> resetState(state) //
             .in(path.assistant()::currentPage).set(2) //
             .in(path::wantToClose).set(true) //
             .in(path::waitingForAsync).set(true));
-        reducers.add("setState/English", (state, path, action) -> addCaptionsTo(state, "English"));
-        reducers.add("setState/German", (state, path, action) -> addCaptionsTo(state, "German"));
+        reducers.add("setState/English", (state, action) -> addCaptionsTo(state, "English"));
+        reducers.add("setState/German", (state, action) -> addCaptionsTo(state, "German"));
 
         // async start/stop
         // TODO should/can the framework do this?
-        reducers.add("startWaitingForAsync", (state, path, action) -> state //
+        reducers.add("startWaitingForAsync", (state, action) -> state //
             .in(path::waitingForAsync).set(true));
-        reducers.add("stopWaitingForAsync", (state, path, action) -> state //
+        reducers.add("stopWaitingForAsync", (state, action) -> state //
             .in(path::waitingForAsync).set(false));
 
         // assistant actions
-        reducers.add("assistantAction/next", (state, path, action) -> state //
+        reducers.add("assistantAction/next", (state, action) -> state //
             .in(path.assistant()::currentPage).update(page -> page + 1));
-        reducers.add("assistantAction/previous", (state, path, action) -> state //
+        reducers.add("assistantAction/previous", (state, action) -> state //
             .in(path.assistant()::currentPage).update(page -> page - 1));
-        reducers.add("assistantAction/close", (state, path, action) -> state //
+        reducers.add("assistantAction/close", (state, action) -> state //
             .in(path::wantToClose).set(true));
         // TODO casting is not really safe here, could be any action
-        reducers.add("assistantAction/reallyPrint", (state, path, action) -> state //
+        reducers.add("assistantAction/reallyPrint", (state, action) -> state //
             .in(path.assistant()::title).set(((MySpecialAction) action).meta()));
 
         // dialog actions
-        reducers.add("dialogAction/reallyClose", (state, path, action) -> state //
+        reducers.add("dialogAction/reallyClose", (state, action) -> state //
             .in(path::wantToClose).set(false) //
             .in(path.assistant()::title).update(title -> title + " closed...") //
             .in(path.assistant()::title).set(state.get(path.user()::firstname) + " was selected.") //
             .in(path.user()::firstname).set("FooUser"));
 
         // table actions
-        reducers.add("requestNewItems", (state, path, action) -> state //
+        reducers.add("requestNewItems", (state, action) -> state //
             .inList(path::items).update(items -> items.size() > 100
                 ? items
                 : items.addAll(PersonService.persons())));
@@ -86,7 +85,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         // TODO use this as default action?
         // TODO pass action as parameter as well!
         // TODO findFirst vs all?
-        reducers.add(".*", (state, path, action) -> {
+        reducers.add(".*", (state, action) -> {
             System.out.println("we have no reducer for action: " + action.type());
             return state  //
                 .in(path.assistant()::title).update(title -> title + "!");
@@ -105,7 +104,6 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
     private Immutable<MySpecialState> resetState(Immutable<MySpecialState> state)
     {
-        final MySpecialState path = state.path();
         final Immutable<MySpecialState> initialState = state.clear() //
             .in(path.ewb()::actions).set(new String[]{"print", "close", "save"}) //
             .in(path.ewb()::title).set("MyEWB") //
@@ -164,10 +162,10 @@ public class MySpecialReducer implements Reducer<MySpecialState>
     }
 
     @Override
-    public Immutable<MySpecialState> reduce(Immutable<MySpecialState> state, MySpecialState path, Action<?> action)
+    public Immutable<MySpecialState> reduce(Immutable<MySpecialState> state, Action<?> action)
     {
         // TODO is this a good pattern? explicit call vs. implicit call?
         // TODO advantage: middleware - logging & co
-        return reducers.reduce(state, path, action);
+        return reducers.reduce(state, action);
     }
 }
