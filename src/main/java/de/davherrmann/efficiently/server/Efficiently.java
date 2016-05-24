@@ -27,6 +27,7 @@ public class Efficiently implements Dispatcher
         state = state.merge(clientData.clientStateDiff());
 
         // 2. possible asynchronous actions
+        new AsyncDispatcher().dispatch(this, clientData.action());
         // 3. reduce
         dispatch(clientData.action());
 
@@ -51,8 +52,6 @@ public class Efficiently implements Dispatcher
         System.out.println("dispatching action: " + action.type());
 
         // TODO dependency injection
-        // TODO should an asynchronous action callback be able to call asynchronous actions again?!?
-        new AsyncDispatcher().dispatch(this, action);
         state = new MySpecialReducer().reduce(state, action);
     }
 }
