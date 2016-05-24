@@ -19,8 +19,6 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
     public MySpecialReducer()
     {
-        final MySpecialState path = pathInstanceFor(MySpecialState.class);
-
         // TODO custom action types?
         // reducers.add("assistantAction/reallyPrint", MySpecialAction.class, (state, path, action) -> state);
 
@@ -32,50 +30,50 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
         // possible states
         reducers.add("setState/firstPageEmpty", (state, action) -> resetState(state) //
-            .in(path.assistant()::currentPage).set(0));
+            .in(path().assistant()::currentPage).set(0));
         reducers.add("setState/firstPageEmptyWaiting", (state, action) -> resetState(state) //
-            .in(path.assistant()::currentPage).set(0) //
-            .in(path::waitingForAsync).set(true));
+            .in(path().assistant()::currentPage).set(0) //
+            .in(path()::waitingForAsync).set(true));
         reducers.add("setState/secondPageEmpty", (state, action) -> resetState(state) //
-            .in(path.assistant()::currentPage).set(1));
+            .in(path().assistant()::currentPage).set(1));
         reducers.add("setState/thirdPageWithDialog", (state, action) -> resetState(state) //
-            .in(path.assistant()::currentPage).set(2) //
-            .in(path::wantToClose).set(true));
+            .in(path().assistant()::currentPage).set(2) //
+            .in(path()::wantToClose).set(true));
         reducers.add("setState/thirdPageWithDialogWaiting", (state, action) -> resetState(state) //
-            .in(path.assistant()::currentPage).set(2) //
-            .in(path::wantToClose).set(true) //
-            .in(path::waitingForAsync).set(true));
+            .in(path().assistant()::currentPage).set(2) //
+            .in(path()::wantToClose).set(true) //
+            .in(path()::waitingForAsync).set(true));
         reducers.add("setState/English", (state, action) -> addCaptionsTo(state, "English"));
         reducers.add("setState/German", (state, action) -> addCaptionsTo(state, "German"));
 
         // async start/stop
         // TODO should/can the framework do this?
         reducers.add("startWaitingForAsync", (state, action) -> state //
-            .in(path::waitingForAsync).set(true));
+            .in(path()::waitingForAsync).set(true));
         reducers.add("stopWaitingForAsync", (state, action) -> state //
-            .in(path::waitingForAsync).set(false));
+            .in(path()::waitingForAsync).set(false));
 
         // assistant actions
         reducers.add("assistantAction/next", (state, action) -> state //
-            .in(path.assistant()::currentPage).update(page -> page + 1));
+            .in(path().assistant()::currentPage).update(page -> page + 1));
         reducers.add("assistantAction/previous", (state, action) -> state //
-            .in(path.assistant()::currentPage).update(page -> page - 1));
+            .in(path().assistant()::currentPage).update(page -> page - 1));
         reducers.add("assistantAction/close", (state, action) -> state //
-            .in(path::wantToClose).set(true));
+            .in(path()::wantToClose).set(true));
         // TODO casting is not really safe here, could be any action
         reducers.add("assistantAction/reallyPrint", (state, action) -> state //
-            .in(path.assistant()::title).set(action.meta().toString()));
+            .in(path().assistant()::title).set(action.meta().toString()));
 
         // dialog actions
         reducers.add("dialogAction/reallyClose", (state, action) -> state //
-            .in(path::wantToClose).set(false) //
-            .in(path.assistant()::title).update(title -> title + " closed...") //
-            .in(path.assistant()::title).set(state.get(path.user()::firstname) + " was selected.") //
-            .in(path.user()::firstname).set("FooUser"));
+            .in(path()::wantToClose).set(false) //
+            .in(path().assistant()::title).update(title -> title + " closed...") //
+            .in(path().assistant()::title).set(state.get(path().user()::firstname) + " was selected.") //
+            .in(path().user()::firstname).set("FooUser"));
 
         // table actions
         reducers.add("requestNewItems", (state, action) -> state //
-            .inList(path::items).update(items -> items.size() > 100
+            .inList(path()::items).update(items -> items.size() > 100
                 ? items
                 : items.addAll(PersonService.persons())));
 
@@ -86,7 +84,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         reducers.add(".*", (state, action) -> {
             System.out.println("we have no reducer for action: " + action.type());
             return state  //
-                .in(path.assistant()::title).update(title -> title + "!");
+                .in(path().assistant()::title).update(title -> title + "!");
         });
 
         // TODO allow state subset?
@@ -98,6 +96,12 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         // Allow function annotations?
         // @Action("assistantAction/next")
         //actionReducerMap.putAll(AnnotatedActionReducers.from(this));
+    }
+
+    // TODO threadLocal problematic? constructor is called in different Thread than reducers!
+    private MySpecialState path()
+    {
+        return pathInstanceFor(MySpecialState.class);
     }
 
     private Immutable<MySpecialState> resetState(Immutable<MySpecialState> state)
