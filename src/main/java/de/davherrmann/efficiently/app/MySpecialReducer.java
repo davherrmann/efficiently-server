@@ -116,6 +116,12 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.form()::lastname).set("Bar") //
             .in(path.form()::firstnameLabel).set("First Name FOo") //
 
+            // TODO this throws an error
+            // .in(path.user()::firstname).set((String) null) //
+            .in(path.user()::firstname).set("") //
+            .in(path.user()::lastname).set("") //
+            .in(path.user()::email).set("") //
+
             .inList(path::possibleStates).update(list -> list //
                 .add(possibleState("firstPageEmpty", "Seite 1 leer")) //
                 .add(possibleState("firstPageEmptyWaiting", "Seite 1 leer wartend")) //
