@@ -1,22 +1,18 @@
 package de.davherrmann.efficiently.app;
 
-import static java.util.concurrent.Executors.newScheduledThreadPool;
-
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
+import static de.davherrmann.efficiently.server.Actions.waitingForAsyncAction;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import javax.inject.Named;
 
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.AsyncDispatcher;
 import de.davherrmann.efficiently.server.Dispatcher;
-import de.davherrmann.efficiently.server.StandardAction;
 
 @Named
 public class MyAsyncDispatcher implements AsyncDispatcher
 {
-    private final ScheduledExecutorService executorService = newScheduledThreadPool(1);
-
     // TODO use async dispatcher to change input values via an explicit event?
     // TODO question: why not change input value state in reducer?
     // advantage: we know when to really set the value on client side
@@ -31,29 +27,13 @@ public class MyAsyncDispatcher implements AsyncDispatcher
         // TODO show best practice for testing synchronously (possibly with futures?)
         if (action.type().equals("assistantAction/print"))
         {
-            executorService.schedule( //
-                () -> {
-                    syncDispatcher.dispatch(new MySpecialAction());
-                    syncDispatcher.dispatch(waitingForAsyncAction(false));
-                }, //
-                2, //
-                TimeUnit.SECONDS);
+            new Thread(() -> {
+                sleepUninterruptibly(2, SECONDS);
+                syncDispatcher.dispatch(new MySpecialAction());
+                syncDispatcher.dispatch(waitingForAsyncAction(false));
+            });
             // TODO no boolean, but counter (several threads) -> use update(x -> x + 1) in reducer
             syncDispatcher.dispatch(waitingForAsyncAction(true));
         }
-    }
-
-    private StandardAction waitingForAsyncAction(final boolean waiting)
-    {
-        return new StandardAction()
-        {
-            @Override
-            public String type()
-            {
-                return waiting
-                    ? "startWaitingForAsync"
-                    : "stopWaitingForAsync";
-            }
-        };
     }
 }
