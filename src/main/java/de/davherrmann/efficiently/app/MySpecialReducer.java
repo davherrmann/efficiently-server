@@ -99,6 +99,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
     }
 
     // TODO threadLocal problematic? constructor is called in different Thread than reducers!
+    // maybe we should provide a path in reducers (state, path, action) -> ...
     private MySpecialState path()
     {
         return pathInstanceFor(MySpecialState.class);
