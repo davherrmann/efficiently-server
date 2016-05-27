@@ -2,7 +2,8 @@ package de.davherrmann.efficiently.view;
 
 import java.util.function.Supplier;
 
+// TODO naming of parameters!
 public interface Bindable<TYPE, STATE>
 {
-    TYPE bindProperties(Class<STATE> stateType, Supplier<STATE> state);
+    TYPE bindAll(Supplier<STATE> state);
 }

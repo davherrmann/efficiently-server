@@ -19,6 +19,8 @@ import java.util.function.Supplier;
 
 import com.google.common.reflect.AbstractInvocationHandler;
 
+import de.davherrmann.immutable.PathRecorder;
+
 public class Components
 {
     private final Class<?> stateType;
@@ -51,7 +53,7 @@ public class Components
             {
                 TEMPLATE_METHOD = Element.class.getDeclaredMethod("template");
                 CONTENT_METHOD = HasContent.class.getDeclaredMethod("content", Element[].class);
-                BINDTOSTATE_METHOD = Bindable.class.getDeclaredMethod("bindProperties", Class.class, Supplier.class);
+                BINDTOSTATE_METHOD = Bindable.class.getDeclaredMethod("bindAll", Supplier.class);
             }
             catch (NoSuchMethodException e)
             {
@@ -79,9 +81,11 @@ public class Components
 
             if (method.equals(BINDTOSTATE_METHOD))
             {
-                final Class<?> innerStateType = (Class<?>) args[0];
-                final Supplier<?> innerState = (Supplier<?>) args[1];
-                final List<String> innerStatePath = pathRecorderInstanceFor(stateType).pathFor(innerState);
+                final PathRecorder<?> pathRecorder = pathRecorderInstanceFor(stateType);
+                final Supplier<?> innerState = (Supplier<?>) args[0];
+                final Class<?> innerStateType = pathRecorder.methodFor(innerState).getReturnType();
+                final List<String> innerStatePath = pathRecorder.pathFor(innerState);
+
                 final Map<String, String> innerStateBindings = stream(innerStateType.getMethods()) //
                     .map(m -> new SimpleEntry<>(m.getName(), on(".").join(innerStatePath) + "." + m.getName())) //
                     .collect(toMap(Entry::getKey, Entry::getValue));

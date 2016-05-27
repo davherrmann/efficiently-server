@@ -95,7 +95,7 @@ public class ComponentsTest
         final TestElement element = create(TESTELEMENT);
 
         // when
-        element.bindProperties(TestElementState.class, path::testElementState);
+        element.bindAll(path::testElementState);
 
         // then
         assertThat(element.template(), is(ImmutableMap.builder() //
