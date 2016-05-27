@@ -6,6 +6,7 @@ import static de.davherrmann.efficiently.view.Dialog.DIALOG;
 import static de.davherrmann.efficiently.view.Input.INPUT;
 import static de.davherrmann.efficiently.view.Panel.PANEL;
 import static de.davherrmann.efficiently.view.Refresher.REFRESHER;
+import static de.davherrmann.efficiently.view.States.STATES;
 import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 
 import javax.inject.Named;
@@ -47,6 +48,8 @@ public class MySpecialView implements View
             .content( //
                 components.create(REFRESHER) //
                     .bindProperties(RefresherProperties.class, path::refresherProperties), //
+                components.create(STATES) //
+                    .states(path::possibleStates), //
                 components.create(ASSISTANT) //
                     .bindProperties(AssistantProperties.class, path::assistantProperties) //
                     .content( //

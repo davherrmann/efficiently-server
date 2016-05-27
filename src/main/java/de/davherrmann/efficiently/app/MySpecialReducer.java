@@ -14,6 +14,7 @@ import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;
 import de.davherrmann.efficiently.view.Dialog;
+import de.davherrmann.efficiently.view.States.PossibleState;
 import de.davherrmann.immutable.Immutable;
 
 @Named
@@ -197,9 +198,9 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         return translation.getOrDefault(fromString, "NO TRANSLATION");
     }
 
-    private MySpecialState.PossibleState possibleState(final String name, String title)
+    private PossibleState possibleState(final String name, String title)
     {
-        return new Immutable<>(MySpecialState.PossibleState.class) //
+        return new Immutable<>(PossibleState.class) //
             .in(path -> path::name).set(name) //
             .in(path -> path::title).set(title) //
             .asObject();

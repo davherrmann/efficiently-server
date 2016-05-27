@@ -6,6 +6,7 @@ import de.davherrmann.efficiently.view.Assistant.AssistantProperties;
 import de.davherrmann.efficiently.view.Dialog.DialogProperties;
 import de.davherrmann.efficiently.view.Element.ElementProperties;
 import de.davherrmann.efficiently.view.Refresher.RefresherProperties;
+import de.davherrmann.efficiently.view.States.PossibleState;
 
 public interface MySpecialState
 {
@@ -67,13 +68,6 @@ public interface MySpecialState
         String lastname();
 
         String email();
-    }
-
-    interface PossibleState
-    {
-        String name();
-
-        String title();
     }
 
     interface Actions
