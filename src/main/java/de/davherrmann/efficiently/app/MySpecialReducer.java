@@ -35,7 +35,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path().assistantProperties()::currentPage).set(0));
         reducers.add("setState/firstPageEmptyWaiting", (state, action) -> resetState(state) //
             .in(path().assistantProperties()::currentPage).set(0) //
-            .in(path()::waitingForAsync).set(true));
+            .in(path().refresherProperties()::refresh).set(true));
         reducers.add("setState/secondPageEmpty", (state, action) -> resetState(state) //
             .in(path().assistantProperties()::currentPage).set(1));
         reducers.add("setState/thirdPageWithDialog", (state, action) -> resetState(state) //
@@ -44,16 +44,16 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         reducers.add("setState/thirdPageWithDialogWaiting", (state, action) -> resetState(state) //
             .in(path().assistantProperties()::currentPage).set(2) //
             .in(path()::wantToClose).set(true) //
-            .in(path()::waitingForAsync).set(true));
+            .in(path().refresherProperties()::refresh).set(true));
         reducers.add("setState/English", (state, action) -> addCaptionsTo(state, "English"));
         reducers.add("setState/German", (state, action) -> addCaptionsTo(state, "German"));
 
         // async start/stop
         // TODO should/can the framework do this?
         reducers.add("startWaitingForAsync", (state, action) -> state //
-            .in(path()::waitingForAsync).set(true));
+            .in(path().refresherProperties()::refresh).set(true));
         reducers.add("stopWaitingForAsync", (state, action) -> state //
-            .in(path()::waitingForAsync).set(false));
+            .in(path().refresherProperties()::refresh).set(false));
 
         // assistant actions
         reducers.add("assistantAction/next", (state, action) -> state //
@@ -114,7 +114,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         final MySpecialState path = pathInstanceFor(MySpecialState.class);
 
         final Immutable<MySpecialState> initialState = state.clear() //
-            .in(path::waitingForAsync).set(false) //
+            .in(path.refresherProperties()::refresh).set(false) //
 
             .in(path.ewb()::actions).set(new String[]{"print", "close", "save"}) //
             .in(path.ewb()::title).set("MyEWB") //
@@ -124,7 +124,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.assistantProperties()::currentPage).set(0) //
 
             .in(path::wantToClose).set(false) //
-            .in(path::waitingForAsync).set(false) //
+            .in(path.refresherProperties()::refresh).set(false) //
             .inList(path::items).set(PersonService.persons()) //
 
             .in(path.form()::firstname).set("Foo") //

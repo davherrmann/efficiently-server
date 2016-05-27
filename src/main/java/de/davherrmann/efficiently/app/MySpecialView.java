@@ -5,14 +5,16 @@ import static de.davherrmann.efficiently.view.Button.BUTTON;
 import static de.davherrmann.efficiently.view.Dialog.DIALOG;
 import static de.davherrmann.efficiently.view.Input.INPUT;
 import static de.davherrmann.efficiently.view.Panel.PANEL;
+import static de.davherrmann.efficiently.view.Refresher.REFRESHER;
 import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 
 import javax.inject.Named;
 
-import de.davherrmann.efficiently.view.Assistant;
+import de.davherrmann.efficiently.view.Assistant.AssistantProperties;
 import de.davherrmann.efficiently.view.Components;
-import de.davherrmann.efficiently.view.Dialog;
+import de.davherrmann.efficiently.view.Dialog.DialogProperties;
 import de.davherrmann.efficiently.view.Element;
+import de.davherrmann.efficiently.view.Refresher.RefresherProperties;
 import de.davherrmann.efficiently.view.View;
 
 @Named
@@ -34,11 +36,13 @@ public class MySpecialView implements View
 
         return components.create(PANEL) //
             .content( //
+                components.create(REFRESHER) //
+                    .bindProperties(RefresherProperties.class, path::refresherProperties), //
                 components.create(ASSISTANT) //
                     // TODO still allow binding without AssistantProperties
                     //.bindProperties((bind, properties) ->  //
                     //    bind(properties::title).to(path.ewb()::title)) //
-                    .bindProperties(Assistant.AssistantProperties.class, path::assistantProperties) //
+                    .bindProperties(AssistantProperties.class, path::assistantProperties) //
                     // TODO we don't need a bindActions! actions are props as well!
                     // .bindActions(AssistantActions.class, path::assistantActions) //
                     .content( //
@@ -48,7 +52,7 @@ public class MySpecialView implements View
                         components.create(INPUT) //
                             .placeholder(path.form()::firstname)), //
                 components.create(DIALOG) //
-                    .bindProperties(Dialog.DialogProperties.class, path::dialogProperties) //
+                    .bindProperties(DialogProperties.class, path::dialogProperties) //
                     .content(path::dialogMessage));//
     }
 }

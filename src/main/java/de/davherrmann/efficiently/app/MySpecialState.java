@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.davherrmann.efficiently.view.Assistant.AssistantProperties;
 import de.davherrmann.efficiently.view.Dialog.DialogProperties;
+import de.davherrmann.efficiently.view.Refresher.RefresherProperties;
 
 public interface MySpecialState
 {
@@ -20,11 +21,11 @@ public interface MySpecialState
     // TODO it should not be DialogState, but rather DialogProperties/DialogAttributes!
     String dialogMessage();
 
+    RefresherProperties refresherProperties();
+
     boolean wantToClose();
 
     List<Item> items();
-
-    boolean waitingForAsync();
 
     Form form();
 
