@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import com.google.common.collect.ImmutableMap;
+
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;
@@ -132,6 +134,14 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.form()::firstnameLabel).set("First Name FOo") //
 
             .in(path.actions()::loginUser).set("assistantAction/close") //
+
+            // TODO styles in here?
+            .in(path.rootElementProperties()::style).set(ImmutableMap.<String, Object>builder() //
+                .put("display", "flex") //
+                .build()) //
+            .in(path.assistantProperties()::style).set(ImmutableMap.<String, Object>builder() //
+                .put("flexGrow", "1") //
+                .build()) //
 
             .in(path.dialogProperties()::title).set("Super major feedback question...") //
             .in(path::dialogMessage).set("Do you really want to close?") //

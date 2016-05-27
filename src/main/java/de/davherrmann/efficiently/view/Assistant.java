@@ -16,7 +16,7 @@ public interface Assistant extends HasContent<Assistant>, Bindable<Assistant, As
     // Assistant title(Supplier<String> title);
     // Assistant currentPage(Supplier<Integer> currentPage);
 
-    interface AssistantProperties
+    interface AssistantProperties extends Element.ElementProperties
     {
         String title();
 

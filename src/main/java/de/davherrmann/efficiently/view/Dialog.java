@@ -13,7 +13,7 @@ public interface Dialog extends HasContent<Dialog>, Bindable<Dialog, Dialog.Dial
         String actionName();
     }
 
-    interface DialogProperties
+    interface DialogProperties extends Element.ElementProperties
     {
         String title();
 

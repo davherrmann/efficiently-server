@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.davherrmann.efficiently.view.Assistant.AssistantProperties;
 import de.davherrmann.efficiently.view.Dialog.DialogProperties;
+import de.davherrmann.efficiently.view.Element.ElementProperties;
 import de.davherrmann.efficiently.view.Refresher.RefresherProperties;
 
 public interface MySpecialState
@@ -11,6 +12,8 @@ public interface MySpecialState
     List<PossibleState> possibleStates();
 
     EWB ewb();
+
+    ElementProperties rootElementProperties();
 
     AssistantProperties assistantProperties();
 

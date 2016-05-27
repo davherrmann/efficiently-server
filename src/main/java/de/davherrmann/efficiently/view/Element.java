@@ -7,4 +7,9 @@ public interface Element
     Class<Element> ELEMENT = Element.class;
 
     Map<String, Object> template();
+
+    interface ElementProperties
+    {
+        Map<String, Object> style();
+    }
 }
