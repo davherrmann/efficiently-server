@@ -3,7 +3,7 @@ package de.davherrmann.efficiently.app;
 import java.util.List;
 
 import de.davherrmann.efficiently.view.Assistant.AssistantProperties;
-import de.davherrmann.efficiently.view.Dialog.DialogState;
+import de.davherrmann.efficiently.view.Dialog.DialogProperties;
 
 public interface MySpecialState
 {
@@ -13,7 +13,7 @@ public interface MySpecialState
 
     AssistantProperties assistantProperties();
 
-    DialogState dialogState();
+    DialogProperties dialogProperties();
 
     // TODO let the user extend DialogState? Or keep content in DialogState as well?
     // content in state is not ok, has to be defined in view

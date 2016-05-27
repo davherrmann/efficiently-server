@@ -48,7 +48,7 @@ public class MySpecialView implements View
                         components.create(INPUT) //
                             .placeholder(path.form()::firstname)), //
                 components.create(DIALOG) //
-                    .bindProperties(Dialog.DialogState.class, path::dialogState) //
+                    .bindProperties(Dialog.DialogProperties.class, path::dialogProperties) //
                     .content(path::dialogMessage));//
     }
 }

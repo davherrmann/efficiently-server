@@ -2,7 +2,7 @@ package de.davherrmann.efficiently.view;
 
 import java.util.List;
 
-public interface Dialog extends HasContent<Dialog>, Bindable<Dialog, Dialog.DialogState>
+public interface Dialog extends HasContent<Dialog>, Bindable<Dialog, Dialog.DialogProperties>
 {
     Class<Dialog> DIALOG = Dialog.class;
 
@@ -13,7 +13,7 @@ public interface Dialog extends HasContent<Dialog>, Bindable<Dialog, Dialog.Dial
         String actionName();
     }
 
-    public interface DialogState
+    interface DialogProperties
     {
         String title();
 

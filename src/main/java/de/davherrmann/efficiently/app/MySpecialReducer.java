@@ -62,7 +62,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path().assistantProperties()::currentPage).update(page -> page - 1));
         reducers.add("assistantAction/close", (state, action) -> state //
             .in(path()::wantToClose).set(true) //
-            .in(path().dialogState()::hidden).set(false));
+            .in(path().dialogProperties()::hidden).set(false));
         // TODO casting is not really safe here, could be any action
         reducers.add("assistantAction/reallyPrint", (state, action) -> state //
             .in(path().assistantProperties()::title).set(action.meta().toString()));
@@ -70,7 +70,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         // dialog actions
         reducers.add("dialogAction/reallyClose", (state, action) -> state //
             .in(path()::wantToClose).set(false) //
-            .in(path().dialogState()::hidden).set(true) //
+            .in(path().dialogProperties()::hidden).set(true) //
             .in(path().assistantProperties()::title).update(title -> title + " closed...") //
             .in(path().assistantProperties()::title).set(state.get(path().user()::firstname) + " was selected.") //
             .in(path().user()::firstname).set("FooUser"));
@@ -133,10 +133,10 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
             .in(path.actions()::loginUser).set("assistantAction/close") //
 
-            .in(path.dialogState()::title).set("Super major feedback question...") //
+            .in(path.dialogProperties()::title).set("Super major feedback question...") //
             .in(path::dialogMessage).set("Do you really want to close?") //
-            .in(path.dialogState()::hidden).set(true) //
-            .in(path.dialogState()::actions).set(newArrayList( //
+            .in(path.dialogProperties()::hidden).set(true) //
+            .in(path.dialogProperties()::actions).set(newArrayList( //
                 dialogAction("dialogAction/reallyClose", "Really close!"),
                 dialogAction("dialogAction/cancelClose", "Cancel!"))) //
 
