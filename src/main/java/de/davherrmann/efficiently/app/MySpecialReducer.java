@@ -1,5 +1,6 @@
 package de.davherrmann.efficiently.app;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 
@@ -10,6 +11,7 @@ import javax.inject.Named;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;
+import de.davherrmann.efficiently.view.Dialog;
 import de.davherrmann.immutable.Immutable;
 
 @Named
@@ -59,7 +61,8 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         reducers.add("assistantAction/previous", (state, action) -> state //
             .in(path().assistant()::currentPage).update(page -> page - 1));
         reducers.add("assistantAction/close", (state, action) -> state //
-            .in(path()::wantToClose).set(true));
+            .in(path()::wantToClose).set(true) //
+            .in(path().notification()::hidden).set(false));
         // TODO casting is not really safe here, could be any action
         reducers.add("assistantAction/reallyPrint", (state, action) -> state //
             .in(path().assistant()::title).set(action.meta().toString()));
@@ -67,6 +70,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         // dialog actions
         reducers.add("dialogAction/reallyClose", (state, action) -> state //
             .in(path()::wantToClose).set(false) //
+            .in(path().notification()::hidden).set(true) //
             .in(path().assistant()::title).update(title -> title + " closed...") //
             .in(path().assistant()::title).set(state.get(path().user()::firstname) + " was selected.") //
             .in(path().user()::firstname).set("FooUser"));
@@ -126,6 +130,16 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.form()::firstname).set("Foo") //
             .in(path.form()::lastname).set("Bar") //
             .in(path.form()::firstnameLabel).set("First Name FOo") //
+
+            .in(path.actions()::loginUser).set("assistantAction/close") //
+
+            .in(path.notification()::title).set("Super major feedback question...") //
+            .in(path.notification()::message).set("Do you really want to close?") //
+            .in(path.notification()::hidden).set(true) //
+            .in(path.notification()::actions).set(newArrayList(new Immutable<>(Dialog.Action.class) //
+                .in(p -> p::type).set("dialogAction/reallyClose") //
+                .in(p -> p::actionName).set("Really close!") //
+                .asObject())) //
 
             // TODO this throws an error
             // .in(path.user()::firstname).set((String) null) //

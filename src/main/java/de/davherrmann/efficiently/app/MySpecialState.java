@@ -2,6 +2,8 @@ package de.davherrmann.efficiently.app;
 
 import java.util.List;
 
+import de.davherrmann.efficiently.view.Dialog.Action;
+
 public interface MySpecialState
 {
     List<PossibleState> possibleStates();
@@ -19,6 +21,21 @@ public interface MySpecialState
     Form form();
 
     Item user();
+
+    Actions actions();
+
+    Notification notification();
+
+    interface Notification
+    {
+        String title();
+
+        String message();
+
+        Boolean hidden();
+
+        List<Action> actions();
+    }
 
     interface EWB
     {
@@ -67,5 +84,10 @@ public interface MySpecialState
         String name();
 
         String title();
+    }
+
+    interface Actions
+    {
+        String loginUser();
     }
 }
