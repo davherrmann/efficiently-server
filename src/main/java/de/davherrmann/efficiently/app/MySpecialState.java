@@ -2,7 +2,8 @@ package de.davherrmann.efficiently.app;
 
 import java.util.List;
 
-import de.davherrmann.efficiently.view.Dialog.Action;
+import de.davherrmann.efficiently.view.Assistant.AssistantProperties;
+import de.davherrmann.efficiently.view.Dialog.DialogState;
 
 public interface MySpecialState
 {
@@ -10,7 +11,14 @@ public interface MySpecialState
 
     EWB ewb();
 
-    Assistant assistant();
+    AssistantProperties assistantProperties();
+
+    DialogState dialogState();
+
+    // TODO let the user extend DialogState? Or keep content in DialogState as well?
+    // content in state is not ok, has to be defined in view
+    // TODO it should not be DialogState, but rather DialogProperties/DialogAttributes!
+    String dialogMessage();
 
     boolean wantToClose();
 
@@ -24,33 +32,11 @@ public interface MySpecialState
 
     Actions actions();
 
-    Notification notification();
-
-    interface Notification
-    {
-        String title();
-
-        String message();
-
-        Boolean hidden();
-
-        List<Action> actions();
-    }
-
     interface EWB
     {
         String[] actions();
 
         String title();
-    }
-
-    interface Assistant
-    {
-        String[] actions();
-
-        String title();
-
-        int currentPage();
     }
 
     interface Item

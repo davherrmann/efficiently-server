@@ -15,6 +15,7 @@ import org.junit.rules.ExpectedException;
 
 import com.google.common.collect.ImmutableMap;
 
+import de.davherrmann.efficiently.view.ComponentsTest.TestElement.TestElementState;
 import de.davherrmann.immutable.PathRecorder;
 
 public class ComponentsTest
@@ -88,6 +89,22 @@ public class ComponentsTest
     }
 
     @Test
+    public void template_returnsMapWithAllStateBindings_whenElementIsBoundToState() throws Exception
+    {
+        // given
+        final TestElement element = create(TESTELEMENT);
+
+        // when
+        element.bindProperties(TestElementState.class, path::testElementState);
+
+        // then
+        assertThat(element.template(), is(ImmutableMap.builder() //
+            .put("type", "TestElement") //
+            .put("title", "testElementState.title") //
+            .build()));
+    }
+
+    @Test
     public void usingUnsupportedMethod_throwsMeaningfulException() throws Exception
     {
         // TODO add documentation to Element
@@ -102,13 +119,18 @@ public class ComponentsTest
         create(TESTELEMENT).unsupportedMethod("Foo");
     }
 
-    public interface TestElement extends HasContent
+    public interface TestElement extends HasContent, Bindable<TestElement, TestElement.TestElementState>
     {
         Class<TestElement> TESTELEMENT = TestElement.class;
 
         TestElement title(Supplier<String> title);
 
         TestElement unsupportedMethod(String unsupported);
+
+        interface TestElementState
+        {
+            String title();
+        }
     }
 
     private interface State
@@ -116,6 +138,8 @@ public class ComponentsTest
         String specialTitle();
 
         State nested();
+
+        TestElementState testElementState();
     }
 
     private <T extends Element> T create(Class<T> type)

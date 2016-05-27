@@ -7,10 +7,14 @@ import static de.davherrmann.immutable.PathRecorder.pathRecorderInstanceFor;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import java.lang.reflect.Method;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Supplier;
 
 import com.google.common.reflect.AbstractInvocationHandler;
@@ -33,6 +37,7 @@ public class Components
     {
         private final Method TEMPLATE_METHOD;
         private final Method CONTENT_METHOD;
+        private final Method BINDTOSTATE_METHOD;
         private final Class<?> componentType;
 
         private HashMap<Object, Object> template = newHashMap();
@@ -46,6 +51,7 @@ public class Components
             {
                 TEMPLATE_METHOD = Element.class.getDeclaredMethod("template");
                 CONTENT_METHOD = HasContent.class.getDeclaredMethod("content", Element[].class);
+                BINDTOSTATE_METHOD = Bindable.class.getDeclaredMethod("bindProperties", Class.class, Supplier.class);
             }
             catch (NoSuchMethodException e)
             {
@@ -63,13 +69,27 @@ public class Components
 
             if (method.equals(CONTENT_METHOD))
             {
-                template.put("content", stream((Element[]) args[0]) //
+                final Element[] elements = (Element[]) args[0];
+                final List<Map<String, Object>> elementTemplates = stream(elements) //
                     .map(Element::template) //
-                    .collect(toList()));
+                    .collect(toList());
+                template.put("content", elementTemplates);
                 return proxy;
             }
 
-            if (method.getParameterCount() == 1 && Supplier.class.isAssignableFrom(method.getParameterTypes()[0]))
+            if (method.equals(BINDTOSTATE_METHOD))
+            {
+                final Class<?> innerStateType = (Class<?>) args[0];
+                final Supplier<?> innerState = (Supplier<?>) args[1];
+                final List<String> innerStatePath = pathRecorderInstanceFor(stateType).pathFor(innerState);
+                final Map<String, String> innerStateBindings = stream(innerStateType.getMethods()) //
+                    .map(m -> new SimpleEntry<>(m.getName(), on(".").join(innerStatePath) + "." + m.getName())) //
+                    .collect(toMap(Entry::getKey, Entry::getValue));
+                template.putAll(innerStateBindings);
+                return proxy;
+            }
+
+            if (acceptsOneSupplier(method))
             {
                 final List<String> path = pathRecorderInstanceFor(stateType).pathFor((Supplier<?>) args[0]);
                 template.put(method.getName(), on(".").join(path));
@@ -81,6 +101,11 @@ public class Components
                     componentType.getName(), //
                     method.getName(), //
                     Element.class.getName()));
+        }
+
+        private boolean acceptsOneSupplier(final Method method)
+        {
+            return method.getParameterCount() == 1 && Supplier.class.isAssignableFrom(method.getParameterTypes()[0]);
         }
     }
 }

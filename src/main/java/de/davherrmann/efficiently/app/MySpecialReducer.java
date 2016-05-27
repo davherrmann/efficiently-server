@@ -32,17 +32,17 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
         // possible states
         reducers.add("setState/firstPageEmpty", (state, action) -> resetState(state) //
-            .in(path().assistant()::currentPage).set(0));
+            .in(path().assistantProperties()::currentPage).set(0));
         reducers.add("setState/firstPageEmptyWaiting", (state, action) -> resetState(state) //
-            .in(path().assistant()::currentPage).set(0) //
+            .in(path().assistantProperties()::currentPage).set(0) //
             .in(path()::waitingForAsync).set(true));
         reducers.add("setState/secondPageEmpty", (state, action) -> resetState(state) //
-            .in(path().assistant()::currentPage).set(1));
+            .in(path().assistantProperties()::currentPage).set(1));
         reducers.add("setState/thirdPageWithDialog", (state, action) -> resetState(state) //
-            .in(path().assistant()::currentPage).set(2) //
+            .in(path().assistantProperties()::currentPage).set(2) //
             .in(path()::wantToClose).set(true));
         reducers.add("setState/thirdPageWithDialogWaiting", (state, action) -> resetState(state) //
-            .in(path().assistant()::currentPage).set(2) //
+            .in(path().assistantProperties()::currentPage).set(2) //
             .in(path()::wantToClose).set(true) //
             .in(path()::waitingForAsync).set(true));
         reducers.add("setState/English", (state, action) -> addCaptionsTo(state, "English"));
@@ -57,22 +57,22 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
         // assistant actions
         reducers.add("assistantAction/next", (state, action) -> state //
-            .in(path().assistant()::currentPage).update(page -> page + 1));
+            .in(path().assistantProperties()::currentPage).update(page -> page + 1));
         reducers.add("assistantAction/previous", (state, action) -> state //
-            .in(path().assistant()::currentPage).update(page -> page - 1));
+            .in(path().assistantProperties()::currentPage).update(page -> page - 1));
         reducers.add("assistantAction/close", (state, action) -> state //
             .in(path()::wantToClose).set(true) //
-            .in(path().notification()::hidden).set(false));
+            .in(path().dialogState()::hidden).set(false));
         // TODO casting is not really safe here, could be any action
         reducers.add("assistantAction/reallyPrint", (state, action) -> state //
-            .in(path().assistant()::title).set(action.meta().toString()));
+            .in(path().assistantProperties()::title).set(action.meta().toString()));
 
         // dialog actions
         reducers.add("dialogAction/reallyClose", (state, action) -> state //
             .in(path()::wantToClose).set(false) //
-            .in(path().notification()::hidden).set(true) //
-            .in(path().assistant()::title).update(title -> title + " closed...") //
-            .in(path().assistant()::title).set(state.get(path().user()::firstname) + " was selected.") //
+            .in(path().dialogState()::hidden).set(true) //
+            .in(path().assistantProperties()::title).update(title -> title + " closed...") //
+            .in(path().assistantProperties()::title).set(state.get(path().user()::firstname) + " was selected.") //
             .in(path().user()::firstname).set("FooUser"));
 
         // table actions
@@ -88,7 +88,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         reducers.add(".*", (state, action) -> {
             System.out.println("we have no reducer for action: " + action.type());
             return state  //
-                .in(path().assistant()::title).update(title -> title + "!");
+                .in(path().assistantProperties()::title).update(title -> title + "!");
         });
 
         // TODO allow state subset?
@@ -119,9 +119,9 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.ewb()::actions).set(new String[]{"print", "close", "save"}) //
             .in(path.ewb()::title).set("MyEWB") //
 
-            .in(path.assistant()::actions).set(new String[]{"print", "close", "save"}) //
-            .in(path.assistant()::title).set("MyAssistant") //
-            .in(path.assistant()::currentPage).set(0) //
+            .in(path.assistantProperties()::actions).set(newArrayList("print", "close", "save")) //
+            .in(path.assistantProperties()::title).set("MyAssistant") //
+            .in(path.assistantProperties()::currentPage).set(0) //
 
             .in(path::wantToClose).set(false) //
             .in(path::waitingForAsync).set(false) //
@@ -133,13 +133,12 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
             .in(path.actions()::loginUser).set("assistantAction/close") //
 
-            .in(path.notification()::title).set("Super major feedback question...") //
-            .in(path.notification()::message).set("Do you really want to close?") //
-            .in(path.notification()::hidden).set(true) //
-            .in(path.notification()::actions).set(newArrayList(new Immutable<>(Dialog.Action.class) //
-                .in(p -> p::type).set("dialogAction/reallyClose") //
-                .in(p -> p::actionName).set("Really close!") //
-                .asObject())) //
+            .in(path.dialogState()::title).set("Super major feedback question...") //
+            .in(path::dialogMessage).set("Do you really want to close?") //
+            .in(path.dialogState()::hidden).set(true) //
+            .in(path.dialogState()::actions).set(newArrayList( //
+                dialogAction("dialogAction/reallyClose", "Really close!"),
+                dialogAction("dialogAction/cancelClose", "Cancel!"))) //
 
             // TODO this throws an error
             // .in(path.user()::firstname).set((String) null) //
@@ -159,10 +158,18 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         return addCaptionsTo(initialState, "German");
     }
 
+    private Dialog.Action dialogAction(final String type, final String name)
+    {
+        return new Immutable<>(Dialog.Action.class) //
+            .in(p -> p::type).set(type) //
+            .in(p -> p::actionName).set(name) //
+            .asObject();
+    }
+
     private Immutable<MySpecialState> addCaptionsTo(Immutable<MySpecialState> state, String language)
     {
         return state //
-            .in(p -> p.assistant()::title).set(captionFor("Deutscher Titel", language)) //
+            .in(p -> p.assistantProperties()::title).set(captionFor("Deutscher Titel", language)) //
             .in(p -> p.form()::firstnameLabel).set(captionFor("Vorname", language));
     }
 

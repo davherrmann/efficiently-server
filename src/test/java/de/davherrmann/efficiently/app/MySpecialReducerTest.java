@@ -18,7 +18,7 @@ public class MySpecialReducerTest
     public void initialState() throws Exception
     {
         // given / then
-        assertThat(initialState.asObject().assistant().currentPage(), is(0));
+        assertThat(initialState.asObject().assistantProperties().currentPage(), is(0));
     }
 
     @Test
@@ -28,8 +28,8 @@ public class MySpecialReducerTest
         final Immutable<MySpecialState> state = reducer.reduce(initialState, action("assistantAction/next"));
 
         // then
-        assertThat(state.asObject().assistant().currentPage(),
-            is(initialState.asObject().assistant().currentPage() + 1));
+        assertThat(state.asObject().assistantProperties().currentPage(),
+            is(initialState.asObject().assistantProperties().currentPage() + 1));
     }
 
     private Action action(final String type)

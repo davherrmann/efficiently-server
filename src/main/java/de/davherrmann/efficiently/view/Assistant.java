@@ -1,19 +1,27 @@
 package de.davherrmann.efficiently.view;
 
-import java.util.function.Supplier;
+import java.util.List;
 
 // TODO specify client side tag name via annotation?
 // @Name("SpecialAssistant")
 // @ClientSideFQName("de.davherrmann.special.Assistant")
-public interface Assistant extends HasContent<Assistant>
+public interface Assistant extends HasContent<Assistant>, Bindable<Assistant, Assistant.AssistantProperties>
 {
     Class<Assistant> ASSISTANT = Assistant.class;
 
+    // TODO do we even need those explicit bindings?
     // TODO specifiy client side attribute name via annotation?
     // @Name("specialActions")
-    Assistant actions(Supplier<String[]> actions);
+    // Assistant actions(Supplier<String[]> actions);
+    // Assistant title(Supplier<String> title);
+    // Assistant currentPage(Supplier<Integer> currentPage);
 
-    Assistant title(Supplier<String> title);
+    interface AssistantProperties
+    {
+        String title();
 
-    Assistant currentPage(Supplier<Integer> currentPage);
+        List<String> actions();
+
+        Integer currentPage();
+    }
 }

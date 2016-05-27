@@ -5,6 +5,7 @@ import static de.davherrmann.efficiently.view.Button.BUTTON;
 import static de.davherrmann.efficiently.view.Dialog.DIALOG;
 import static de.davherrmann.efficiently.view.Input.INPUT;
 import static de.davherrmann.efficiently.view.Panel.PANEL;
+import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -20,10 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.Gson;
 
 import de.davherrmann.efficiently.app.MySpecialState;
+import de.davherrmann.efficiently.view.Assistant.AssistantProperties;
 import de.davherrmann.efficiently.view.Components;
+import de.davherrmann.efficiently.view.Dialog.DialogState;
 import de.davherrmann.efficiently.view.Panel;
 import de.davherrmann.immutable.Immutable;
-import de.davherrmann.immutable.PathRecorder;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:8080")
@@ -63,15 +65,26 @@ public class EfficientlyController
     public String view()
     {
         final Components components = new Components(MySpecialState.class);
-        final MySpecialState path = PathRecorder.pathInstanceFor(MySpecialState.class);
+        final MySpecialState path = pathInstanceFor(MySpecialState.class);
+
+        // TODO just do:
+        // components.create(ASSISTANT).bindProperties(path.assistant());
+
+        // TODO when binding, we have:
+        // - properties (DialogProperties)
+        // - actions (DialogActions?) --> no! actions are properties!
+        // - content
 
         // TODO extract into a View
         final Panel view = components.create(PANEL) //
             .content( //
                 components.create(ASSISTANT) //
-                    .title(path.assistant()::title) //
-                    .actions(path.assistant()::actions) //
-                    .currentPage(path.assistant()::currentPage) //
+                    // TODO still allow binding without AssistantProperties
+                    //.bindProperties((bind, properties) ->  //
+                    //    bind(properties::title).to(path.ewb()::title)) //
+                    .bindProperties(AssistantProperties.class, path::assistantProperties) //
+                    // TODO we don't need a bindActions! actions are props as well!
+                    // .bindActions(AssistantActions.class, path::assistantActions) //
                     .content( //
                         components.create(BUTTON) //
                             .onClick(path.actions()::loginUser) //
@@ -79,11 +92,8 @@ public class EfficientlyController
                         components.create(INPUT) //
                             .placeholder(path.form()::firstname)), //
                 components.create(DIALOG) //
-                    .title(path.notification()::title) //
-                    // TODO something like a "not(path)"?!
-                    .hidden(path.notification()::hidden) //
-                    .actions(path.notification()::actions) //
-                    .content(path.notification()::message));//
+                    .bindProperties(DialogState.class, path::dialogState) //
+                    .content(path::dialogMessage));//
 
         return new Gson().toJson(view.template());
     }
