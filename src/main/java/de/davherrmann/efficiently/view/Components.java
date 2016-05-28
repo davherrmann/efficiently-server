@@ -3,6 +3,7 @@ package de.davherrmann.efficiently.view;
 import static com.google.common.base.Joiner.on;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.reflect.Reflection.newProxy;
+import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 import static de.davherrmann.immutable.PathRecorder.pathRecorderInstanceFor;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -10,11 +11,14 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.google.common.reflect.AbstractInvocationHandler;
@@ -39,7 +43,8 @@ public class Components
     {
         private final Method TEMPLATE_METHOD;
         private final Method CONTENT_METHOD;
-        private final Method BINDTOSTATE_METHOD;
+        private final Method BINDALL_METHOD;
+        private final Method BIND_METHOD;
         private final Class<?> componentType;
 
         private HashMap<Object, Object> template = newHashMap();
@@ -53,7 +58,8 @@ public class Components
             {
                 TEMPLATE_METHOD = Element.class.getDeclaredMethod("template");
                 CONTENT_METHOD = HasContent.class.getDeclaredMethod("content", Element[].class);
-                BINDTOSTATE_METHOD = Bindable.class.getDeclaredMethod("bindAll", Supplier.class);
+                BINDALL_METHOD = Bindable.class.getDeclaredMethod("bindAll", Supplier.class);
+                BIND_METHOD = Bindable.class.getDeclaredMethod("bind", Function.class);
             }
             catch (NoSuchMethodException e)
             {
@@ -79,7 +85,7 @@ public class Components
                 return proxy;
             }
 
-            if (method.equals(BINDTOSTATE_METHOD))
+            if (method.equals(BINDALL_METHOD))
             {
                 final PathRecorder<?> pathRecorder = pathRecorderInstanceFor(stateType);
                 final Supplier<?> innerState = (Supplier<?>) args[0];
@@ -91,6 +97,27 @@ public class Components
                     .collect(toMap(Entry::getKey, Entry::getValue));
                 template.putAll(innerStateBindings);
                 return proxy;
+            }
+
+            if (method.equals(BIND_METHOD))
+            {
+                final Supplier<IllegalStateException> bindableNotFoundException = //
+                    () -> new IllegalStateException("Bindable method used, Bindable interface not present!");
+
+                final Type propertiesType = stream(componentType.getGenericInterfaces()) //
+                    .filter(i -> i instanceof ParameterizedType) //
+                    .map(i -> (ParameterizedType) i) //
+                    .filter(i -> Bindable.class.equals(i.getRawType())) //
+                    .findFirst() //
+                    .map(ParameterizedType::getActualTypeArguments) //
+                    .orElseThrow(bindableNotFoundException)[1];
+
+                @SuppressWarnings("unchecked")
+                final Function<Object, Supplier<Object>> mapping = (Function<Object, Supplier<Object>>) args[0];
+                final Supplier<Object> nestedProperty = mapping.apply(pathInstanceFor((Class<?>) propertiesType));
+                final List<String> nestedPropertyPath = pathRecorderInstanceFor((Class<?>) propertiesType).pathFor(
+                    nestedProperty);
+                return new BinderImpl(nestedPropertyPath, proxy);
             }
 
             if (acceptsOneSupplier(method))
@@ -105,6 +132,27 @@ public class Components
                     componentType.getName(), //
                     method.getName(), //
                     Element.class.getName()));
+        }
+
+        private class BinderImpl implements Bindable.Binder<Object, Object>
+        {
+            private final List<String> nestedPropertyPath;
+            private final Object proxy;
+
+            public BinderImpl(List<String> nestedPropertyPath, Object proxy)
+            {
+                this.nestedPropertyPath = nestedPropertyPath;
+                this.proxy = proxy;
+            }
+
+            @Override
+            public Object to(Supplier<Object> state)
+            {
+                template.put( //
+                    on(".").join(nestedPropertyPath), //
+                    on(".").join(pathRecorderInstanceFor(stateType).pathFor(state)));
+                return proxy;
+            }
         }
 
         private boolean acceptsOneSupplier(final Method method)

@@ -137,7 +137,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.actions()::loginUser).set("assistantAction/close") //
 
             // TODO styles in here?
-            .in(path.rootElementProperties()::style).set(ImmutableMap.<String, Object>builder() //
+            .in(path::rootElementStyle).set(ImmutableMap.<String, Object>builder() //
                 .put("display", "flex") //
                 .build()) //
             .in(path.assistantProperties()::style).set(ImmutableMap.<String, Object>builder() //

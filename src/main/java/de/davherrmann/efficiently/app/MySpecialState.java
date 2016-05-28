@@ -1,10 +1,10 @@
 package de.davherrmann.efficiently.app;
 
 import java.util.List;
+import java.util.Map;
 
 import de.davherrmann.efficiently.view.Assistant.AssistantProperties;
 import de.davherrmann.efficiently.view.Dialog.DialogProperties;
-import de.davherrmann.efficiently.view.Element.ElementProperties;
 import de.davherrmann.efficiently.view.Refresher.RefresherProperties;
 import de.davherrmann.efficiently.view.States.PossibleState;
 
@@ -14,7 +14,7 @@ public interface MySpecialState
 
     EWB ewb();
 
-    ElementProperties rootElementProperties();
+    Map<String, Object> rootElementStyle();
 
     AssistantProperties assistantProperties();
 

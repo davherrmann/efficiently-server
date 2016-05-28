@@ -40,7 +40,7 @@ public class MySpecialView implements View
         // .bindActions(AssistantActions.class, path::assistantActions) //
 
         return components.create(PANEL) //
-            .bindAll(path::rootElementProperties) //
+            .bind(properties -> properties::style).to(path::rootElementStyle) //
             .content( //
                 components.create(REFRESHER) //
                     .bindAll(path::refresherProperties), //

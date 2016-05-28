@@ -15,7 +15,7 @@ import org.junit.rules.ExpectedException;
 
 import com.google.common.collect.ImmutableMap;
 
-import de.davherrmann.efficiently.view.ComponentsTest.TestElement.TestElementState;
+import de.davherrmann.efficiently.view.ComponentsTest.TestElement.TestElementProperties;
 import de.davherrmann.immutable.PathRecorder;
 
 public class ComponentsTest
@@ -105,6 +105,22 @@ public class ComponentsTest
     }
 
     @Test
+    public void template_returnsMapWithSingleBinding_whenElementIsBoundToNestedState() throws Exception
+    {
+        // given
+        final TestElement element = create(TESTELEMENT);
+
+        // when
+        element.bind(properties -> properties::title).to(path::specialTitle);
+
+        // then
+        assertThat(element.template(), is(ImmutableMap.builder() //
+            .put("type", "TestElement") //
+            .put("title", "specialTitle") //
+            .build()));
+    }
+
+    @Test
     public void usingUnsupportedMethod_throwsMeaningfulException() throws Exception
     {
         // TODO add documentation to Element
@@ -119,7 +135,8 @@ public class ComponentsTest
         create(TESTELEMENT).unsupportedMethod("Foo");
     }
 
-    public interface TestElement extends HasContent, Bindable<TestElement, TestElement.TestElementState>
+    public interface TestElement
+        extends HasContent<TestElement>, Bindable<TestElement, TestElement.TestElementProperties>
     {
         Class<TestElement> TESTELEMENT = TestElement.class;
 
@@ -127,7 +144,7 @@ public class ComponentsTest
 
         TestElement unsupportedMethod(String unsupported);
 
-        interface TestElementState
+        interface TestElementProperties
         {
             String title();
         }
@@ -139,7 +156,7 @@ public class ComponentsTest
 
         State nested();
 
-        TestElementState testElementState();
+        TestElementProperties testElementState();
     }
 
     private <T extends Element> T create(Class<T> type)
