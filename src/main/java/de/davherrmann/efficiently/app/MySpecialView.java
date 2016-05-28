@@ -24,17 +24,10 @@ public class MySpecialView implements View
         final Components components = new Components(MySpecialState.class);
         final MySpecialState path = pathInstanceFor(MySpecialState.class);
 
-        // TODO just do:
-        // components.create(ASSISTANT).bindAll(path.assistant());
-
         // TODO when binding, we have:
         // - properties (DialogProperties)
         // - actions (DialogActions?) --> no! actions are properties!
         // - content
-
-        // TODO still allow binding without AssistantProperties
-        //.bindAll((bind, properties) ->  //
-        //    bind(properties::title).to(path.ewb()::title)) //
 
         // TODO we don't need a bindActions! actions are props as well!
         // .bindActions(AssistantActions.class, path::assistantActions) //
