@@ -112,6 +112,8 @@ public class ComponentsTest
         final ExtendedTestElement element = create(ExtendedTestElement.class);
 
         // when
+        // TODO we should forbid extending elements:
+        // reason: ExtendedTestElement.bindAll(...) returns TestElement!
         element.bindAll(path::testElementState);
 
         // then
