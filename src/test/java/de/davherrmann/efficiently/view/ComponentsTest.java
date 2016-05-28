@@ -27,7 +27,7 @@ public class ComponentsTest
     private final State path = PathRecorder.pathInstanceFor(State.class);
 
     @Test
-    public void template_returnsMapContainingType_withInitialElement() throws Exception
+    public void create_addsElementTypeInformation() throws Exception
     {
         // given
         final Element element = create(TESTELEMENT);
@@ -38,7 +38,7 @@ public class ComponentsTest
             .build()));
     }
     @Test
-    public void template_returnsMapWithPathToTitle_whenTitleIsSet() throws Exception
+    public void bindingDirectProperty_worksWithNonNestedBinding() throws Exception
     {
         // given
         final TestElement element = create(TESTELEMENT);
@@ -54,7 +54,7 @@ public class ComponentsTest
     }
 
     @Test
-    public void template_returnsMapWithPathToNestedTitle_whenTitleIsSet() throws Exception
+    public void bindingDirectProperty_worksWithNestedBinding() throws Exception
     {
         // given
         final TestElement element = create(TESTELEMENT);
@@ -70,7 +70,8 @@ public class ComponentsTest
     }
 
     @Test
-    public void template_returnsMapWithArrayContainingNestedElementMap_whenElementIsSetAsContent() throws Exception
+    @SuppressWarnings("unchecked")
+    public void content_addsNestedElement() throws Exception
     {
         // given
         final TestElement element = create(TESTELEMENT);
@@ -89,7 +90,7 @@ public class ComponentsTest
     }
 
     @Test
-    public void template_returnsMapWithAllStateBindings_whenElementIsBoundToState() throws Exception
+    public void bindAll_createsAllBindings_whenElementIsABindable() throws Exception
     {
         // given
         final TestElement element = create(TESTELEMENT);
@@ -105,7 +106,23 @@ public class ComponentsTest
     }
 
     @Test
-    public void template_returnsMapWithSingleBinding_whenElementIsBoundToNestedState() throws Exception
+    public void bindAll_createsAllBindings_whenSuperElementIsABindable() throws Exception
+    {
+        // given
+        final ExtendedTestElement element = create(ExtendedTestElement.class);
+
+        // when
+        element.bindAll(path::testElementState);
+
+        // then
+        assertThat(element.template(), is(ImmutableMap.builder() //
+            .put("type", "ExtendedTestElement") //
+            .put("title", "testElementState.title") //
+            .build()));
+    }
+
+    @Test
+    public void bind_createsSpecificBinding() throws Exception
     {
         // given
         final TestElement element = create(TESTELEMENT);
@@ -148,6 +165,10 @@ public class ComponentsTest
         {
             String title();
         }
+    }
+
+    public interface ExtendedTestElement extends TestElement
+    {
     }
 
     private interface State

@@ -101,16 +101,13 @@ public class Components
 
             if (method.equals(BIND_METHOD))
             {
-                final Supplier<IllegalStateException> bindableNotFoundException = //
-                    () -> new IllegalStateException("Bindable method used, Bindable interface not present!");
-
                 final Type propertiesType = stream(componentType.getGenericInterfaces()) //
                     .filter(i -> i instanceof ParameterizedType) //
                     .map(i -> (ParameterizedType) i) //
                     .filter(i -> Bindable.class.equals(i.getRawType())) //
                     .findFirst() //
                     .map(ParameterizedType::getActualTypeArguments) //
-                    .orElseThrow(bindableNotFoundException)[1];
+                    .get()[1];
 
                 @SuppressWarnings("unchecked")
                 final Function<Object, Supplier<Object>> mapping = (Function<Object, Supplier<Object>>) args[0];
