@@ -44,7 +44,7 @@ public class Efficiently implements Dispatcher
         dispatch(clientData.action());
 
         // 4. calc diff
-        final Immutable<MySpecialState> diff = lastSentState.diff(state);
+        final Immutable<MySpecialState> diff = lastSentState.merge(clientData.clientStateDiff()).diff(state);
         System.out.println("state diff: " + new Gson().toJson(diff));
 
         // 5. save last sent state
