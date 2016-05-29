@@ -20,5 +20,9 @@ public interface Field extends Element, Bindable<Field, Field.FieldProperties>
         String model();
 
         String form();
+
+        boolean disabled();
+
+        boolean readonly();
     }
 }
