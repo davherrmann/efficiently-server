@@ -9,6 +9,7 @@ import static de.davherrmann.efficiently.view.FormGroup.FORMGROUP;
 import static de.davherrmann.efficiently.view.Panel.PANEL;
 import static de.davherrmann.efficiently.view.Refresher.REFRESHER;
 import static de.davherrmann.efficiently.view.States.STATES;
+import static de.davherrmann.efficiently.view.Table.TABLE;
 import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 
 import javax.inject.Named;
@@ -55,7 +56,9 @@ public class MySpecialView implements View
                                     .bindAll(path.pageUserLogin()::userEmail), //
                                 components.create(BUTTON) //
                                     .onClick(path.actions()::loginUser) //
-                                    .content(path.pageUserLogin().userFirstName()::value)))), //
+                                    .content(path.pageUserLogin().userFirstName()::value))), //
+                        components.create(TABLE) //
+                            .bindAll(path::tableProperties)), //
                 components.create(DIALOG) //
                     .bindAll(path::dialogProperties) //
                     .content(path::dialogMessage));//

@@ -4,6 +4,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -15,6 +16,7 @@ import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;
 import de.davherrmann.efficiently.view.Dialog;
 import de.davherrmann.efficiently.view.States.PossibleState;
+import de.davherrmann.efficiently.view.Table;
 import de.davherrmann.immutable.Immutable;
 
 @Named
@@ -161,6 +163,14 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.pageUserLogin().userEmail()::value).set("email@email.com") //
             .in(path.pageUserLogin().userEmail()::label).set("Email") //
 
+            .in(path.tableProperties()::items).set(persons()) //
+            .in(path.tableProperties()::columns).set(newArrayList( //
+                column("thumbnail", 100), //
+                column("firstname"), //
+                column("lastname"), //
+                column("email"))) //
+            .in(path.tableProperties()::onRequestNewItems).set("requestNewItems") //
+
             .inList(path::possibleStates).update(list -> list //
                 .add(possibleState("firstPageEmpty", "Seite 1 leer")) //
                 .add(possibleState("firstPageEmptyWaiting", "Seite 1 leer wartend")) //
@@ -171,6 +181,25 @@ public class MySpecialReducer implements Reducer<MySpecialState>
                 .add(possibleState("English", "Englisch")) //
             );
         return addCaptionsTo(initialState, "German");
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Object> persons()
+    {
+        return (List<Object>) (List<?>) PersonService.persons();
+    }
+
+    private Table.Column column(String columnName)
+    {
+        return column(columnName, -1);
+    }
+
+    private Table.Column column(String columnName, int width)
+    {
+        return new Immutable<>(Table.Column.class) //
+            .in(p -> p::name).set(columnName) //
+            .in(p -> p::width).set(width) //
+            .asObject();
     }
 
     private Dialog.Action dialogAction(final String type, final String name)

@@ -8,6 +8,7 @@ import de.davherrmann.efficiently.view.Dialog.DialogProperties;
 import de.davherrmann.efficiently.view.Field.FieldProperties;
 import de.davherrmann.efficiently.view.Refresher.RefresherProperties;
 import de.davherrmann.efficiently.view.States.PossibleState;
+import de.davherrmann.efficiently.view.Table.TableProperties;
 
 public interface MySpecialState
 {
@@ -35,6 +36,8 @@ public interface MySpecialState
     Actions actions();
 
     PageUserLogin pageUserLogin();
+
+    TableProperties tableProperties();
 
     interface PageUserLogin
     {
