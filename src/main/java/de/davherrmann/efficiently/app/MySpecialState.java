@@ -5,6 +5,7 @@ import java.util.Map;
 
 import de.davherrmann.efficiently.view.Assistant.AssistantProperties;
 import de.davherrmann.efficiently.view.Dialog.DialogProperties;
+import de.davherrmann.efficiently.view.Field.FieldProperties;
 import de.davherrmann.efficiently.view.Refresher.RefresherProperties;
 import de.davherrmann.efficiently.view.States.PossibleState;
 
@@ -36,6 +37,17 @@ public interface MySpecialState
     Item user();
 
     Actions actions();
+
+    PageUserLogin pageUserLogin();
+
+    interface PageUserLogin
+    {
+        FieldProperties userFirstName();
+
+        FieldProperties userLastName();
+
+        FieldProperties userEmail();
+    }
 
     interface EWB
     {

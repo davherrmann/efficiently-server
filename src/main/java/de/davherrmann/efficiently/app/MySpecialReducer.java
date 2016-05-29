@@ -157,6 +157,12 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.user()::lastname).set("") //
             .in(path.user()::email).set("") //
 
+            .in(path.pageUserLogin().userFirstName()::cols).set("2,4") //
+            .in(path.pageUserLogin().userFirstName()::value).set("Test") //
+
+            .in(path.pageUserLogin().userEmail()::value).set("email@email.com") //
+            .in(path.pageUserLogin().userEmail()::label).set("Email") //
+
             .inList(path::possibleStates).update(list -> list //
                 .add(possibleState("firstPageEmpty", "Seite 1 leer")) //
                 .add(possibleState("firstPageEmptyWaiting", "Seite 1 leer wartend")) //

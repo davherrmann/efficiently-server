@@ -3,6 +3,9 @@ package de.davherrmann.efficiently.app;
 import static de.davherrmann.efficiently.view.Assistant.ASSISTANT;
 import static de.davherrmann.efficiently.view.Button.BUTTON;
 import static de.davherrmann.efficiently.view.Dialog.DIALOG;
+import static de.davherrmann.efficiently.view.Field.FIELD;
+import static de.davherrmann.efficiently.view.Form.FORM;
+import static de.davherrmann.efficiently.view.FormGroup.FORMGROUP;
 import static de.davherrmann.efficiently.view.Input.INPUT;
 import static de.davherrmann.efficiently.view.Panel.PANEL;
 import static de.davherrmann.efficiently.view.Refresher.REFRESHER;
@@ -42,11 +45,20 @@ public class MySpecialView implements View
                 components.create(ASSISTANT) //
                     .bindAll(path::assistantProperties) //
                     .content( //
-                        components.create(BUTTON) //
-                            .onClick(path.actions()::loginUser) //
-                            .content(path.form()::firstname), //
-                        components.create(INPUT) //
-                            .placeholder(path.form()::firstname)), //
+                        components.create(FORM).content( //
+                            components.create(FORMGROUP).content( //
+                                components.create(FIELD) //
+                                    .bindAll(path.pageUserLogin()::userFirstName), //
+                                components.create(FIELD) //
+                                    .bindAll(path.pageUserLogin()::userLastName)), //
+                            components.create(FORMGROUP).content( //
+                                components.create(FIELD) //
+                                    .bindAll(path.pageUserLogin()::userEmail)), //
+                            components.create(BUTTON) //
+                                .onClick(path.actions()::loginUser) //
+                                .content(path.form()::firstname), //
+                            components.create(INPUT) //
+                                .placeholder(path.form()::firstname))), //
                 components.create(DIALOG) //
                     .bindAll(path::dialogProperties) //
                     .content(path::dialogMessage));//
