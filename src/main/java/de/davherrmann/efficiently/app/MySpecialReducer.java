@@ -151,10 +151,11 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             // TODO this throws an error
             // .in(path.user()::firstname).set((String) null) //
 
-            .in(path.pageUserLogin().userFirstName()::cols).set("2,4") //
+            .in(path.pageUserLogin().userFirstName()::cols).set("2,3") //
             .in(path.pageUserLogin().userFirstName()::value).set("Test") //
             .in(path.pageUserLogin().userFirstName()::label).set("First Name") //
 
+            .in(path.pageUserLogin().userLastName()::cols).set("2,3") //
             .in(path.pageUserLogin().userLastName()::label).set("Last Name") //
 
             .in(path.pageUserLogin().userEmail()::value).set("email@email.com") //
