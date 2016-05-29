@@ -6,7 +6,6 @@ import static de.davherrmann.efficiently.view.Dialog.DIALOG;
 import static de.davherrmann.efficiently.view.Field.FIELD;
 import static de.davherrmann.efficiently.view.Form.FORM;
 import static de.davherrmann.efficiently.view.FormGroup.FORMGROUP;
-import static de.davherrmann.efficiently.view.Input.INPUT;
 import static de.davherrmann.efficiently.view.Panel.PANEL;
 import static de.davherrmann.efficiently.view.Refresher.REFRESHER;
 import static de.davherrmann.efficiently.view.States.STATES;
@@ -53,12 +52,10 @@ public class MySpecialView implements View
                                     .bindAll(path.pageUserLogin()::userLastName)), //
                             components.create(FORMGROUP).content( //
                                 components.create(FIELD) //
-                                    .bindAll(path.pageUserLogin()::userEmail)), //
-                            components.create(BUTTON) //
-                                .onClick(path.actions()::loginUser) //
-                                .content(path.pageUserLogin().userFirstName()::value), //
-                            components.create(INPUT) //
-                                .placeholder(path.pageUserLogin().userFirstName()::value))), //
+                                    .bindAll(path.pageUserLogin()::userEmail), //
+                                components.create(BUTTON) //
+                                    .onClick(path.actions()::loginUser) //
+                                    .content(path.pageUserLogin().userFirstName()::value)))), //
                 components.create(DIALOG) //
                     .bindAll(path::dialogProperties) //
                     .content(path::dialogMessage));//
