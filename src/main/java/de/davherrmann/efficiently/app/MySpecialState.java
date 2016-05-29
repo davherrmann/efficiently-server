@@ -12,34 +12,32 @@ import de.davherrmann.efficiently.view.Table.TableProperties;
 
 public interface MySpecialState
 {
-    List<PossibleState> possibleStates();
-
-    EWB ewb();
-
-    Map<String, Object> rootElementStyle();
-
-    AssistantProperties assistantProperties();
-
-    DialogProperties dialogProperties();
-
-    // TODO let the user extend DialogState? Or keep content in DialogState as well?
-    // content in state is not ok, has to be defined in view
-    // TODO it should not be DialogState, but rather DialogProperties/DialogAttributes!
-    String dialogMessage();
-
-    RefresherProperties refresherProperties();
-
-    boolean wantToClose();
-
-    List<Item> items();
-
     Actions actions();
 
-    PageUserLogin pageUserLogin();
+    GlobalState global();
 
-    TableProperties tableProperties();
+    PageUserLoginState pageUserLogin();
 
-    interface PageUserLogin
+    PageUserListState pageUserList();
+
+    interface GlobalState
+    {
+        List<PossibleState> possibleStates();
+
+        Map<String, Object> rootElementStyle();
+
+        AssistantProperties assistantProperties();
+
+        DialogProperties dialogProperties();
+
+        RefresherProperties refresherProperties();
+
+        // TODO Keep content in DialogProperties as well?
+        // content in state is not ok, has to be defined in view
+        String dialogMessage();
+    }
+
+    interface PageUserLoginState
     {
         // TODO explicitly mark as controlled/uncontrolled?
         FieldProperties userFirstName();
@@ -49,11 +47,11 @@ public interface MySpecialState
         FieldProperties userEmail();
     }
 
-    interface EWB
+    interface PageUserListState
     {
-        String[] actions();
+        TableProperties tableProperties();
 
-        String title();
+        List<Item> items();
     }
 
     interface Item

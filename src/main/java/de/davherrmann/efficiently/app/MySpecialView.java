@@ -35,15 +35,18 @@ public class MySpecialView implements View
         // TODO we don't need a bindActions! actions are props as well!
         // .bindActions(AssistantActions.class, path::assistantActions) //
 
+        // TODO allow computed/derived values? or should derivations rather be declared in the reducer?
+        //.bind(p -> p::disabled).to(isEmpty(path.pageUserLogin()::userLastName)), //
+
         return components.create(PANEL) //
-            .bind(properties -> properties::style).to(path::rootElementStyle) //
+            .bind(properties -> properties::style).to(path.global()::rootElementStyle) //
             .content( //
                 components.create(REFRESHER) //
-                    .bindAll(path::refresherProperties), //
+                    .bindAll(path.global()::refresherProperties), //
                 components.create(STATES) //
-                    .states(path::possibleStates), //
+                    .states(path.global()::possibleStates), //
                 components.create(ASSISTANT) //
-                    .bindAll(path::assistantProperties) //
+                    .bindAll(path.global()::assistantProperties) //
                     .content( //
                         components.create(FORM).content( //
                             components.create(FORMGROUP).content( //
@@ -58,9 +61,9 @@ public class MySpecialView implements View
                                     .onClick(path.actions()::loginUser) //
                                     .content(path.pageUserLogin().userFirstName()::value))), //
                         components.create(TABLE) //
-                            .bindAll(path::tableProperties)), //
+                            .bindAll(path.pageUserList()::tableProperties)), //
                 components.create(DIALOG) //
-                    .bindAll(path::dialogProperties) //
-                    .content(path::dialogMessage));//
+                    .bindAll(path.global()::dialogProperties) //
+                    .content(path.global()::dialogMessage));//
     }
 }

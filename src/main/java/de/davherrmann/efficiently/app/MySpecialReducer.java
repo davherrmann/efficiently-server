@@ -35,55 +35,55 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         reducers.add("changeLanguage/German", (state, action) -> addCaptionsTo(state, "German"));
         reducers.add("changeLanguage/English", (state, action) -> addCaptionsTo(state, "English"));
 
+        final MySpecialState.GlobalState global = path().global();
+
         // possible states
         reducers.add("setState/firstPageEmpty", (state, action) -> resetState(state) //
-            .in(path().assistantProperties()::currentPage).set(0));
+            .in(global.assistantProperties()::currentPage).set(0));
         reducers.add("setState/firstPageEmptyWaiting", (state, action) -> resetState(state) //
-            .in(path().assistantProperties()::currentPage).set(0) //
-            .in(path().refresherProperties()::refresh).set(true));
+            .in(global.assistantProperties()::currentPage).set(0) //
+            .in(global.refresherProperties()::refresh).set(true));
         reducers.add("setState/secondPageEmpty", (state, action) -> resetState(state) //
-            .in(path().assistantProperties()::currentPage).set(1));
+            .in(global.assistantProperties()::currentPage).set(1));
         reducers.add("setState/thirdPageWithDialog", (state, action) -> resetState(state) //
-            .in(path().assistantProperties()::currentPage).set(2) //
-            .in(path()::wantToClose).set(true));
+            .in(global.assistantProperties()::currentPage).set(2) //
+            .in(global.dialogProperties()::hidden).set(false));
         reducers.add("setState/thirdPageWithDialogWaiting", (state, action) -> resetState(state) //
-            .in(path().assistantProperties()::currentPage).set(2) //
-            .in(path()::wantToClose).set(true) //
-            .in(path().refresherProperties()::refresh).set(true));
+            .in(global.assistantProperties()::currentPage).set(2) //
+            .in(global.dialogProperties()::hidden).set(false) //
+            .in(global.refresherProperties()::refresh).set(true));
         reducers.add("setState/English", (state, action) -> addCaptionsTo(state, "English"));
         reducers.add("setState/German", (state, action) -> addCaptionsTo(state, "German"));
 
         // async start/stop
         // TODO should/can the framework do this?
         reducers.add("startWaitingForAsync", (state, action) -> state //
-            .in(path().refresherProperties()::refresh).set(true));
+            .in(global.refresherProperties()::refresh).set(true));
         reducers.add("stopWaitingForAsync", (state, action) -> state //
-            .in(path().refresherProperties()::refresh).set(false));
+            .in(global.refresherProperties()::refresh).set(false));
 
         // assistant actions
         reducers.add("assistantAction/next", (state, action) -> state //
-            .in(path().assistantProperties()::currentPage).update(page -> page + 1));
+            .in(global.assistantProperties()::currentPage).update(page -> page + 1));
         reducers.add("assistantAction/previous", (state, action) -> state //
-            .in(path().assistantProperties()::currentPage).update(page -> page - 1));
+            .in(global.assistantProperties()::currentPage).update(page -> page - 1));
         reducers.add("assistantAction/close", (state, action) -> state //
-            .in(path()::wantToClose).set(true) //
-            .in(path().dialogProperties()::hidden).set(false));
+            .in(global.dialogProperties()::hidden).set(false));
         // TODO casting is not really safe here, could be any action
         reducers.add("assistantAction/reallyPrint", (state, action) -> state //
-            .in(path().assistantProperties()::title).set(action.meta().toString()));
+            .in(global.assistantProperties()::title).set(action.meta().toString()));
 
         // dialog actions
         reducers.add("dialogAction/reallyClose", (state, action) -> state //
-            .in(path()::wantToClose).set(false) //
-            .in(path().dialogProperties()::hidden).set(true) //
-            .in(path().assistantProperties()::title).update(title -> title + " closed...") //
-            .in(path().assistantProperties()::title) //
+            .in(global.dialogProperties()::hidden).set(true) //
+            .in(global.assistantProperties()::title).update(title -> title + " closed...") //
+            .in(global.assistantProperties()::title) //
             .set(state.get(path().pageUserLogin().userFirstName()::value) + " was selected.") //
             .in(path().pageUserLogin().userFirstName()::value).set("FooUser"));
 
         // table actions
         reducers.add("requestNewItems", (state, action) -> state //
-            .inList(path()::items).update(items -> items.size() > 100
+            .inList(path().pageUserList()::items).update(items -> items.size() > 100
                 ? items
                 : items.addAll(PersonService.persons())));
 
@@ -94,7 +94,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         reducers.add(".*", (state, action) -> {
             System.out.println("we have no reducer for action: " + action.type());
             return state  //
-                .in(path().assistantProperties()::title).update(title -> title + "!");
+                .in(global.assistantProperties()::title).update(title -> title + "!");
         });
 
         // TODO allow state subset?
@@ -118,35 +118,32 @@ public class MySpecialReducer implements Reducer<MySpecialState>
     private Immutable<MySpecialState> resetState(Immutable<MySpecialState> state)
     {
         final MySpecialState path = pathInstanceFor(MySpecialState.class);
+        final MySpecialState.GlobalState global = path.global();
 
         final Immutable<MySpecialState> initialState = state.clear() //
-            .in(path.refresherProperties()::refresh).set(false) //
+            .in(global.refresherProperties()::refresh).set(false) //
 
-            .in(path.ewb()::actions).set(new String[]{"print", "close", "save"}) //
-            .in(path.ewb()::title).set("MyEWB") //
+            .in(global.assistantProperties()::actions).set(newArrayList("print", "close", "save")) //
+            .in(global.assistantProperties()::title).set("MyAssistant") //
+            .in(global.assistantProperties()::currentPage).set(0) //
 
-            .in(path.assistantProperties()::actions).set(newArrayList("print", "close", "save")) //
-            .in(path.assistantProperties()::title).set("MyAssistant") //
-            .in(path.assistantProperties()::currentPage).set(0) //
-
-            .in(path::wantToClose).set(false) //
-            .in(path.refresherProperties()::refresh).set(false) //
-            .inList(path::items).set(PersonService.persons()) //
+            .in(global.refresherProperties()::refresh).set(false) //
+            .inList(path.pageUserList()::items).set(PersonService.persons()) //
 
             .in(path.actions()::loginUser).set("assistantAction/close") //
 
             // TODO styles in here?
-            .in(path::rootElementStyle).set(ImmutableMap.<String, Object>builder() //
+            .in(global::rootElementStyle).set(ImmutableMap.<String, Object>builder() //
                 .put("display", "flex") //
                 .build()) //
-            .in(path.assistantProperties()::style).set(ImmutableMap.<String, Object>builder() //
+            .in(global.assistantProperties()::style).set(ImmutableMap.<String, Object>builder() //
                 .put("flexGrow", "1") //
                 .build()) //
 
-            .in(path.dialogProperties()::title).set("Super major feedback question...") //
-            .in(path::dialogMessage).set("Do you really want to close?") //
-            .in(path.dialogProperties()::hidden).set(true) //
-            .in(path.dialogProperties()::actions).set(newArrayList( //
+            .in(global.dialogProperties()::title).set("Super major feedback question...") //
+            .in(global::dialogMessage).set("Do you really want to close?") //
+            .in(global.dialogProperties()::hidden).set(true) //
+            .in(global.dialogProperties()::actions).set(newArrayList( //
                 dialogAction("dialogAction/reallyClose", "Really close!"),
                 dialogAction("dialogAction/cancelClose", "Cancel!"))) //
 
@@ -163,15 +160,15 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.pageUserLogin().userEmail()::value).set("email@email.com") //
             .in(path.pageUserLogin().userEmail()::label).set("Email") //
 
-            .in(path.tableProperties()::items).set(persons()) //
-            .in(path.tableProperties()::columns).set(newArrayList( //
+            .in(path.pageUserList().tableProperties()::items).set(persons()) //
+            .in(path.pageUserList().tableProperties()::columns).set(newArrayList( //
                 column("thumbnail", 100), //
                 column("firstname"), //
                 column("lastname"), //
                 column("email"))) //
-            .in(path.tableProperties()::onRequestNewItems).set("requestNewItems") //
+            .in(path.pageUserList().tableProperties()::onRequestNewItems).set("requestNewItems") //
 
-            .inList(path::possibleStates).update(list -> list //
+            .inList(global::possibleStates).update(list -> list //
                 .add(possibleState("firstPageEmpty", "Seite 1 leer")) //
                 .add(possibleState("firstPageEmptyWaiting", "Seite 1 leer wartend")) //
                 .add(possibleState("secondPageEmpty", "Seite 2 leer")) //
@@ -213,7 +210,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
     private Immutable<MySpecialState> addCaptionsTo(Immutable<MySpecialState> state, String language)
     {
         return state //
-            .in(p -> p.assistantProperties()::title).set(captionFor("Deutscher Titel", language)) //
+            .in(p -> p.global().assistantProperties()::title).set(captionFor("Deutscher Titel", language)) //
             .in(p -> p.pageUserLogin().userFirstName()::label).set(captionFor("Vorname", language));
     }
 
