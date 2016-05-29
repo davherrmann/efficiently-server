@@ -56,9 +56,9 @@ public class MySpecialView implements View
                                     .bindAll(path.pageUserLogin()::userEmail)), //
                             components.create(BUTTON) //
                                 .onClick(path.actions()::loginUser) //
-                                .content(path.form()::firstname), //
+                                .content(path.pageUserLogin().userFirstName()::value), //
                             components.create(INPUT) //
-                                .placeholder(path.form()::firstname))), //
+                                .placeholder(path.pageUserLogin().userFirstName()::value))), //
                 components.create(DIALOG) //
                     .bindAll(path::dialogProperties) //
                     .content(path::dialogMessage));//

@@ -75,8 +75,9 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path()::wantToClose).set(false) //
             .in(path().dialogProperties()::hidden).set(true) //
             .in(path().assistantProperties()::title).update(title -> title + " closed...") //
-            .in(path().assistantProperties()::title).set(state.get(path().user()::firstname) + " was selected.") //
-            .in(path().user()::firstname).set("FooUser"));
+            .in(path().assistantProperties()::title) //
+            .set(state.get(path().pageUserLogin().userFirstName()::value) + " was selected.") //
+            .in(path().pageUserLogin().userFirstName()::value).set("FooUser"));
 
         // table actions
         reducers.add("requestNewItems", (state, action) -> state //
@@ -130,10 +131,6 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.refresherProperties()::refresh).set(false) //
             .inList(path::items).set(PersonService.persons()) //
 
-            .in(path.form()::firstname).set("Foo") //
-            .in(path.form()::lastname).set("Bar") //
-            .in(path.form()::firstnameLabel).set("First Name FOo") //
-
             .in(path.actions()::loginUser).set("assistantAction/close") //
 
             // TODO styles in here?
@@ -153,12 +150,12 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
             // TODO this throws an error
             // .in(path.user()::firstname).set((String) null) //
-            .in(path.user()::firstname).set("") //
-            .in(path.user()::lastname).set("") //
-            .in(path.user()::email).set("") //
 
             .in(path.pageUserLogin().userFirstName()::cols).set("2,4") //
             .in(path.pageUserLogin().userFirstName()::value).set("Test") //
+            .in(path.pageUserLogin().userFirstName()::label).set("First Name") //
+
+            .in(path.pageUserLogin().userLastName()::label).set("Last Name") //
 
             .in(path.pageUserLogin().userEmail()::value).set("email@email.com") //
             .in(path.pageUserLogin().userEmail()::label).set("Email") //
@@ -187,7 +184,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
     {
         return state //
             .in(p -> p.assistantProperties()::title).set(captionFor("Deutscher Titel", language)) //
-            .in(p -> p.form()::firstnameLabel).set(captionFor("Vorname", language));
+            .in(p -> p.pageUserLogin().userFirstName()::label).set(captionFor("Vorname", language));
     }
 
     private String captionFor(String fromString, String language)

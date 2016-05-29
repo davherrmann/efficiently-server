@@ -32,16 +32,13 @@ public interface MySpecialState
 
     List<Item> items();
 
-    Form form();
-
-    Item user();
-
     Actions actions();
 
     PageUserLogin pageUserLogin();
 
     interface PageUserLogin
     {
+        // TODO explicitly mark as controlled/uncontrolled?
         FieldProperties userFirstName();
 
         FieldProperties userLastName();
@@ -67,19 +64,6 @@ public interface MySpecialState
         String email();
 
         String additional();
-    }
-
-    interface Form
-    {
-        // TODO explicitly mark versioned/client side/controlled input state?
-        // @Versioned
-        String firstnameLabel();
-
-        String firstname();
-
-        String lastname();
-
-        String email();
     }
 
     interface Actions
