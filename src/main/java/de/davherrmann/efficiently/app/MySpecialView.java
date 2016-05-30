@@ -24,12 +24,12 @@ import de.davherrmann.efficiently.view.View;
 @Named
 public class MySpecialView implements View
 {
+    private final Components components = new Components(MySpecialState.class);
+    private final MySpecialState path = pathInstanceFor(MySpecialState.class);
+
     @Override
     public Element create()
     {
-        final Components components = new Components(MySpecialState.class);
-        final MySpecialState path = pathInstanceFor(MySpecialState.class);
-
         // TODO when binding, we have:
         // - properties (DialogProperties)
         // - actions (DialogActions?) --> no! actions are properties!
@@ -43,36 +43,41 @@ public class MySpecialView implements View
 
         final MySpecialState.PageUserLoginState pageUserLogin = path.pageUserLogin();
 
-        return components.create(PANEL) //
+        return create(PANEL) //
             .bind(properties -> properties::style).to(path.global()::rootElementStyle) //
             .content( //
-                components.create(REFRESHER) //
+                create(REFRESHER) //
                     .bindAll(path.global()::refresherProperties), //
-                components.create(STATES) //
+                create(STATES) //
                     .states(path.global()::possibleStates), //
-                components.create(ASSISTANT) //
+                create(ASSISTANT) //
                     .bindAll(path.global()::assistantProperties) //
                     .content( //
-                        components.create(FORM).content( //
-                            components.create(FORMGROUP).content( //
-                                components.create(FIELD) //
+                        create(FORM).content( //
+                            create(FORMGROUP).content( //
+                                create(FIELD) //
                                     .bindAll(pageUserLogin::userFirstName), //
-                                components.create(FIELD) //
+                                create(FIELD) //
                                     .bindAll(pageUserLogin::userLastName) //
                                     .bind(p -> p::disabled).to(isEmpty(pageUserLogin.userFirstName()::value))), //
-                            components.create(FORMGROUP).content( //
-                                components.create(FIELD) //
+                            create(FORMGROUP).content( //
+                                create(FIELD) //
                                     .bindAll(pageUserLogin::userEmail), //
-                                components.create(BUTTON) //
+                                create(BUTTON) //
                                     .onClick(path.actions()::loginUser) //
                                     .content(pageUserLogin.userFirstName()::value))), //
-                        components.create(BUTTON) //
+                        create(BUTTON) //
                             .content(pageUserLogin.userFirstName()::value), //
-                        components.create(TABLE) //
+                        create(TABLE) //
                             .bindAll(path.pageUserList()::tableProperties)), //
-                components.create(DIALOG) //
+                create(DIALOG) //
                     .bindAll(path.global()::dialogProperties) //
                     .content(path.global()::dialogMessage));//
+    }
+
+    private <T extends Element> T create(Class<T> elementType)
+    {
+        return components.create(elementType);
     }
 
     private Derivation isEmpty(Supplier<String> string)
