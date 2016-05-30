@@ -66,6 +66,8 @@ public class MySpecialView implements View
                                 components.create(BUTTON) //
                                     .onClick(path.actions()::loginUser) //
                                     .content(pageUserLogin.userFirstName()::value))), //
+                        components.create(BUTTON) //
+                            .content(pageUserLogin.userFirstName()::value), //
                         components.create(TABLE) //
                             .bindAll(path.pageUserList()::tableProperties)), //
                 components.create(DIALOG) //
