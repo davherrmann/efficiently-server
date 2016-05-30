@@ -12,9 +12,12 @@ import static de.davherrmann.efficiently.view.States.STATES;
 import static de.davherrmann.efficiently.view.Table.TABLE;
 import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 
+import java.util.function.Supplier;
+
 import javax.inject.Named;
 
 import de.davherrmann.efficiently.view.Components;
+import de.davherrmann.efficiently.view.Derivation;
 import de.davherrmann.efficiently.view.Element;
 import de.davherrmann.efficiently.view.View;
 
@@ -38,6 +41,8 @@ public class MySpecialView implements View
         // TODO allow computed/derived values? or should derivations rather be declared in the reducer?
         //.bind(p -> p::disabled).to(isEmpty(path.pageUserLogin()::userLastName)), //
 
+        final MySpecialState.PageUserLoginState pageUserLogin = path.pageUserLogin();
+
         return components.create(PANEL) //
             .bind(properties -> properties::style).to(path.global()::rootElementStyle) //
             .content( //
@@ -51,19 +56,26 @@ public class MySpecialView implements View
                         components.create(FORM).content( //
                             components.create(FORMGROUP).content( //
                                 components.create(FIELD) //
-                                    .bindAll(path.pageUserLogin()::userFirstName), //
+                                    .bindAll(pageUserLogin::userFirstName), //
                                 components.create(FIELD) //
-                                    .bindAll(path.pageUserLogin()::userLastName)), //
+                                    .bindAll(pageUserLogin::userLastName) //
+                                    .bind(p -> p::disabled).to(isEmpty(pageUserLogin.userFirstName()::value))), //
                             components.create(FORMGROUP).content( //
                                 components.create(FIELD) //
-                                    .bindAll(path.pageUserLogin()::userEmail), //
+                                    .bindAll(pageUserLogin::userEmail), //
                                 components.create(BUTTON) //
                                     .onClick(path.actions()::loginUser) //
-                                    .content(path.pageUserLogin().userFirstName()::value))), //
+                                    .content(pageUserLogin.userFirstName()::value))), //
                         components.create(TABLE) //
                             .bindAll(path.pageUserList()::tableProperties)), //
                 components.create(DIALOG) //
                     .bindAll(path.global()::dialogProperties) //
                     .content(path.global()::dialogMessage));//
     }
+
+    private Derivation isEmpty(Supplier<String> string)
+    {
+        return new Derivation("isEmpty", string);
+    }
+
 }

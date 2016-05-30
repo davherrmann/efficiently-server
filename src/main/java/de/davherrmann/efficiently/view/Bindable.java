@@ -13,5 +13,7 @@ public interface Bindable<TYPE, STATE>
     interface Binder<TYPE, PROP>
     {
         TYPE to(Supplier<PROP> state);
+
+        TYPE to(Derivation derivation);
     }
 }

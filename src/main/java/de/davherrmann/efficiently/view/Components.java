@@ -3,7 +3,6 @@ package de.davherrmann.efficiently.view;
 import static com.google.common.base.Joiner.on;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.reflect.Reflection.newProxy;
-import static de.davherrmann.immutable.PathRecorder.pathInstanceFor;
 import static de.davherrmann.immutable.PathRecorder.pathRecorderInstanceFor;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
@@ -12,7 +11,6 @@ import static java.util.stream.Collectors.toMap;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +19,7 @@ import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.AbstractInvocationHandler;
 
 import de.davherrmann.immutable.PathRecorder;
@@ -43,6 +42,7 @@ public class Components
     {
         private final Method TEMPLATE_METHOD;
         private final Method CONTENT_METHOD;
+        private final Method CONTENT_STRING_METHOD;
         private final Method BINDALL_METHOD;
         private final Method BIND_METHOD;
         private final Class<?> componentType;
@@ -58,6 +58,7 @@ public class Components
             {
                 TEMPLATE_METHOD = Element.class.getDeclaredMethod("template");
                 CONTENT_METHOD = HasContent.class.getDeclaredMethod("content", Element[].class);
+                CONTENT_STRING_METHOD = HasContent.class.getDeclaredMethod("content", Supplier.class);
                 BINDALL_METHOD = Bindable.class.getDeclaredMethod("bindAll", Supplier.class);
                 BIND_METHOD = Bindable.class.getDeclaredMethod("bind", Function.class);
             }
@@ -85,6 +86,13 @@ public class Components
                 return proxy;
             }
 
+            if (method.equals(CONTENT_STRING_METHOD))
+            {
+                final String path = on(".").join(pathRecorderInstanceFor(stateType).pathFor((Supplier<?>) args[0]));
+                template.put(method.getName(), path);
+                return proxy;
+            }
+
             if (method.equals(BINDALL_METHOD))
             {
                 final PathRecorder<?> pathRecorder = pathRecorderInstanceFor(stateType);
@@ -92,8 +100,10 @@ public class Components
                 final Class<?> innerStateType = pathRecorder.methodFor(innerState).getReturnType();
                 final List<String> innerStatePath = pathRecorder.pathFor(innerState);
 
-                final Map<String, String> innerStateBindings = stream(innerStateType.getMethods()) //
-                    .map(m -> new SimpleEntry<>(m.getName(), on(".").join(innerStatePath) + "." + m.getName())) //
+                final Map<String, Object> innerStateBindings = stream(innerStateType.getMethods()) //
+                    .map(m -> new SimpleEntry<>( //
+                        m.getName(), //
+                        derivation("none", on(".").join(innerStatePath) + "." + m.getName()))) //
                     .collect(toMap(Entry::getKey, Entry::getValue));
                 template.putAll(innerStateBindings);
                 return proxy;
@@ -101,7 +111,7 @@ public class Components
 
             if (method.equals(BIND_METHOD))
             {
-                final Type propertiesType = stream(componentType.getGenericInterfaces()) //
+                final Class<?> propertiesType = (Class<?>) stream(componentType.getGenericInterfaces()) //
                     .filter(i -> i instanceof ParameterizedType) //
                     .map(i -> (ParameterizedType) i) //
                     .filter(i -> Bindable.class.equals(i.getRawType())) //
@@ -109,18 +119,21 @@ public class Components
                     .map(ParameterizedType::getActualTypeArguments) //
                     .get()[1];
 
+                final PathRecorder<?> propertyTypePathRecorder = pathRecorderInstanceFor(propertiesType);
+
                 @SuppressWarnings("unchecked")
                 final Function<Object, Supplier<Object>> mapping = (Function<Object, Supplier<Object>>) args[0];
-                final Supplier<Object> nestedProperty = mapping.apply(pathInstanceFor((Class<?>) propertiesType));
-                final List<String> nestedPropertyPath = pathRecorderInstanceFor((Class<?>) propertiesType).pathFor(
-                    nestedProperty);
+                final Supplier<Object> nestedProperty = mapping.apply(propertyTypePathRecorder.path());
+                final List<String> nestedPropertyPath = propertyTypePathRecorder.pathFor(nestedProperty);
                 return new BinderImpl(nestedPropertyPath, proxy);
             }
 
             if (acceptsOneSupplier(method))
             {
-                final List<String> path = pathRecorderInstanceFor(stateType).pathFor((Supplier<?>) args[0]);
-                template.put(method.getName(), on(".").join(path));
+                final String path = on(".").join(pathRecorderInstanceFor(stateType).pathFor((Supplier<?>) args[0]));
+                template.put( //
+                    method.getName(), //
+                    derivation("none", path));
                 return proxy;
             }
 
@@ -135,21 +148,39 @@ public class Components
         {
             private final List<String> nestedPropertyPath;
             private final Object proxy;
+            private final PathRecorder<?> pathRecorder;
 
             public BinderImpl(List<String> nestedPropertyPath, Object proxy)
             {
                 this.nestedPropertyPath = nestedPropertyPath;
                 this.proxy = proxy;
+                pathRecorder = pathRecorderInstanceFor(stateType);
             }
 
             @Override
             public Object to(Supplier<Object> state)
             {
+                return to(new Derivation("none", state));
+            }
+
+            @Override
+            public Object to(Derivation derivation)
+            {
                 template.put( //
                     on(".").join(nestedPropertyPath), //
-                    on(".").join(pathRecorderInstanceFor(stateType).pathFor(state)));
+                    derivation( //
+                        derivation.name(), //
+                        on(".").join(pathRecorder.pathFor(derivation.sourceValue()))));
                 return proxy;
             }
+        }
+
+        private Map<Object, Object> derivation(String name, String sourcePath)
+        {
+            return ImmutableMap.builder() //
+                .put("name", name) //
+                .put("sourceValue", sourcePath) //
+                .build();
         }
 
         private boolean acceptsOneSupplier(final Method method)
