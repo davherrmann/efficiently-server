@@ -8,15 +8,8 @@ public class Actions
 
     public static StandardAction waitingForAsyncAction(final boolean waiting)
     {
-        return new StandardAction()
-        {
-            @Override
-            public String type()
-            {
-                return waiting
-                    ? "startWaitingForAsync"
-                    : "stopWaitingForAsync";
-            }
-        };
+        return new StandardAction(waiting
+            ? "startWaitingForAsync"
+            : "stopWaitingForAsync");
     }
 }
