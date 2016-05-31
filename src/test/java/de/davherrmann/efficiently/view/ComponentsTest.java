@@ -7,6 +7,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.rules.ExpectedException.none;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.junit.Rule;
@@ -49,7 +50,7 @@ public class ComponentsTest
         // then
         assertThat(element.template(), is(ImmutableMap.builder() //
             .put("type", "TestElement") //
-            .put("title", "specialTitle") //
+            .put("title", noDerivation("specialTitle")) //
             .build()));
     }
 
@@ -65,7 +66,7 @@ public class ComponentsTest
         // then
         assertThat(element.template(), is(ImmutableMap.builder() //
             .put("type", "TestElement") //
-            .put("title", "nested.specialTitle") //
+            .put("title", noDerivation("nested.specialTitle")) //
             .build()));
     }
 
@@ -101,7 +102,7 @@ public class ComponentsTest
         // then
         assertThat(element.template(), is(ImmutableMap.builder() //
             .put("type", "TestElement") //
-            .put("title", "testElementState.title") //
+            .put("title", noDerivation("testElementState.title")) //
             .build()));
     }
 
@@ -119,7 +120,7 @@ public class ComponentsTest
         // then
         assertThat(element.template(), is(ImmutableMap.builder() //
             .put("type", "ExtendedTestElement") //
-            .put("title", "testElementState.title") //
+            .put("title", noDerivation("testElementState.title")) //
             .build()));
     }
 
@@ -135,7 +136,7 @@ public class ComponentsTest
         // then
         assertThat(element.template(), is(ImmutableMap.builder() //
             .put("type", "TestElement") //
-            .put("title", "specialTitle") //
+            .put("title", noDerivation("specialTitle")) //
             .build()));
     }
 
@@ -152,6 +153,14 @@ public class ComponentsTest
 
         // when
         create(TESTELEMENT).unsupportedMethod("Foo");
+    }
+
+    private Map<String, String> noDerivation(final String value)
+    {
+        return ImmutableMap.<String, String>builder() //
+            .put("name", "none") //
+            .put("sourceValue", value) //
+            .build();
     }
 
     public interface TestElement
