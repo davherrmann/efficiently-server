@@ -62,10 +62,13 @@ public class MySpecialView implements View
                                     .bind(p -> p::disabled).to(isEmpty(pageUserLogin.userFirstName()::value))), //
                             create(FORMGROUP).content( //
                                 create(FIELD) //
-                                    .bindAll(pageUserLogin::userEmail), //
+                                    .bindAll(pageUserLogin::userEmail) //
+                                    .bind(p -> p::disabled).to(
+                                    lengthGreaterThanFour(pageUserLogin.userFirstName()::value)), //
                                 create(BUTTON) //
                                     .onClick(path.actions()::loginUser) //
                                     .content(pageUserLogin.userFirstName()::value))), //
+                        create(Page1.class), //
                         create(BUTTON) //
                             .content(pageUserLogin.userFirstName()::value), //
                         create(TABLE) //
@@ -80,9 +83,18 @@ public class MySpecialView implements View
         return components.create(elementType);
     }
 
+    private Derivation lengthGreaterThanFour(Supplier<String> string)
+    {
+        return new Derivation("lengthGreaterThanFour", string);
+    }
+
     private Derivation isEmpty(Supplier<String> string)
     {
         return new Derivation("isEmpty", string);
+    }
+
+    private interface Page1 extends Element
+    {
     }
 
 }
