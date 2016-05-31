@@ -6,9 +6,9 @@ public class Actions
     {
     }
 
-    public static StandardAction waitingForAsyncAction(final boolean waiting)
+    public static Action waitingForAsyncAction(final boolean waiting)
     {
-        return new StandardAction(waiting
+        return new Action(waiting
             ? "startWaitingForAsync"
             : "stopWaitingForAsync");
     }

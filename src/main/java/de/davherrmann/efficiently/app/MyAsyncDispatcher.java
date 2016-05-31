@@ -8,7 +8,6 @@ import javax.inject.Named;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.AsyncDispatcher;
 import de.davherrmann.efficiently.server.Dispatcher;
-import de.davherrmann.efficiently.server.StandardAction;
 
 @Named
 public class MyAsyncDispatcher extends AsyncDispatcher
@@ -22,7 +21,7 @@ public class MyAsyncDispatcher extends AsyncDispatcher
 
     // TODO api: return true if waiting for async action, return false if not? or dispatch: "waiting for async"?
     @Override
-    public void dispatch(final Dispatcher syncDispatcher, final Action<?> action)
+    public void dispatch(final Dispatcher syncDispatcher, final Action action)
     {
         // TODO show best practice for testing synchronously (possibly with futures?)
         if (action.type().equals("assistantAction/print"))
@@ -32,7 +31,7 @@ public class MyAsyncDispatcher extends AsyncDispatcher
             execute(syncDispatcher, () -> {
                 // simulate long lasting service call
                 sleepUninterruptibly(2, SECONDS);
-                syncDispatcher.dispatch(new StandardAction("assistantAction/reallyPrint"));
+                syncDispatcher.dispatch(new Action("assistantAction/reallyPrint"));
             });
         }
     }

@@ -4,7 +4,7 @@ import static de.davherrmann.efficiently.server.Actions.waitingForAsyncAction;
 
 public abstract class AsyncDispatcher
 {
-    public abstract void dispatch(Dispatcher syncDispatcher, Action<?> action);
+    public abstract void dispatch(Dispatcher syncDispatcher, Action action);
 
     protected void execute(Dispatcher syncDispatcher, Runnable target)
     {

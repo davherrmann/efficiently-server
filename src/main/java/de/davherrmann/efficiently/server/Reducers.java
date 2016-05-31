@@ -17,7 +17,7 @@ public class Reducers<S> implements Reducer<S>
     }
 
     @Override
-    public Immutable<S> reduce(Immutable<S> state, Action<?> action)
+    public Immutable<S> reduce(Immutable<S> state, Action action)
     {
         return reducers.stream() //
             .filter(r -> r.pattern().matcher(action.type()).matches()) //

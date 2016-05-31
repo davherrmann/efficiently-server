@@ -237,7 +237,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
     }
 
     @Override
-    public Immutable<MySpecialState> reduce(Immutable<MySpecialState> state, Action<?> action)
+    public Immutable<MySpecialState> reduce(Immutable<MySpecialState> state, Action action)
     {
         // TODO is this a good pattern? explicit call vs. implicit call?
         // TODO advantage: middleware - logging & co

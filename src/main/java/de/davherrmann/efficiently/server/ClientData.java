@@ -6,13 +6,13 @@ import de.davherrmann.immutable.Immutable;
 public class ClientData
 {
     private Immutable<MySpecialState> clientStateDiff;
-    private StandardAction action;
+    private Action action;
 
     public ClientData()
     {
     }
 
-    public ClientData(Immutable<MySpecialState> clientStateDiff, StandardAction action)
+    public ClientData(Immutable<MySpecialState> clientStateDiff, Action action)
     {
         this.clientStateDiff = clientStateDiff;
         this.action = action;
@@ -23,7 +23,7 @@ public class ClientData
         return clientStateDiff;
     }
 
-    public StandardAction action()
+    public Action action()
     {
         return action;
     }
