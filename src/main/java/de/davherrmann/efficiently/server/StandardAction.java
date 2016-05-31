@@ -16,7 +16,13 @@ public class StandardAction implements Action<Map<String, String>>
 
     public StandardAction(final String type)
     {
+        this(type, ImmutableMap.of());
+    }
+
+    public StandardAction(final String type, final Map<String, String> meta)
+    {
         this.type = type;
+        this.meta = meta;
     }
 
     public String type()
