@@ -23,6 +23,7 @@ import de.davherrmann.immutable.Immutable;
 public class MySpecialReducer implements Reducer<MySpecialState>
 {
     private final Reducers<MySpecialState> reducers = new Reducers<>();
+    private final MySpecialState path = pathInstanceFor(MySpecialState.class);
 
     public MySpecialReducer()
     {
@@ -35,7 +36,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         reducers.add("changeLanguage/German", (state, action) -> addCaptionsTo(state, "German"));
         reducers.add("changeLanguage/English", (state, action) -> addCaptionsTo(state, "English"));
 
-        final MySpecialState.GlobalState global = path().global();
+        final MySpecialState.GlobalState global = path.global();
 
         // possible states
         reducers.add("setState/firstPageEmpty", (state, action) -> resetState(state) //
@@ -78,12 +79,12 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(global.dialogProperties()::hidden).set(true) //
             .in(global.assistantProperties()::title).update(title -> title + " closed...") //
             .in(global.assistantProperties()::title) //
-            .set(state.get(path().pageUserLogin().userFirstName()::value) + " was selected.") //
-            .in(path().pageUserLogin().userFirstName()::value).set("FooUser"));
+            .set(state.get(path.pageUserLogin().userFirstName()::value) + " was selected.") //
+            .in(path.pageUserLogin().userFirstName()::value).set("FooUser"));
 
         // table actions
         reducers.add("requestNewItems", (state, action) -> state //
-            .inList(path().pageUserList()::items).update(items -> items.size() > 100
+            .inList(path.pageUserList()::items).update(items -> items.size() > 100
                 ? items
                 : items.addAll(PersonService.persons())));
 
@@ -106,13 +107,6 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         // Allow function annotations?
         // @Action("assistantAction/next")
         //actionReducerMap.putAll(AnnotatedActionReducers.from(this));
-    }
-
-    // TODO threadLocal problematic? constructor is called in different Thread than reducers!
-    // maybe we should provide a path in reducers (state, path, action) -> ...
-    private MySpecialState path()
-    {
-        return pathInstanceFor(MySpecialState.class);
     }
 
     private Immutable<MySpecialState> resetState(Immutable<MySpecialState> state)
