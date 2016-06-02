@@ -39,7 +39,10 @@ public class MySpecialView implements View
         // .bindActions(AssistantActions.class, path::assistantActions) //
 
         // TODO allow computed/derived values? or should derivations rather be declared in the reducer?
-        //.bind(p -> p::disabled).to(isEmpty(path.pageUserLogin()::userLastName)), //
+        // .bind(p -> p::disabled).to(isEmpty(path.pageUserLogin()::userLastName)), //
+
+        // TODO allow setting static props directly
+        // .in(p -> p::validateOn).set(Field.ValidateOn.BLUR)
 
         final MySpecialState.PageUserLoginState pageUserLogin = path.pageUserLogin();
 
