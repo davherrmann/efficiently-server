@@ -4,6 +4,12 @@ public interface Field extends Element, Bindable<Field, Field.FieldProperties>
 {
     Class<Field> FIELD = Field.class;
 
+    enum ValidateOn
+    {
+        BLUR,
+        CHANGE
+    }
+
     interface FieldProperties extends Element.ElementProperties
     {
         String value();
@@ -24,5 +30,12 @@ public interface Field extends Element, Bindable<Field, Field.FieldProperties>
         boolean disabled();
 
         boolean readonly();
+
+        ValidateOn validateOn();
+
+        boolean valid();
+
+        String error();
     }
+
 }

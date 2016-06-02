@@ -15,6 +15,7 @@ import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;
 import de.davherrmann.efficiently.view.Dialog;
+import de.davherrmann.efficiently.view.Field;
 import de.davherrmann.efficiently.view.States.PossibleState;
 import de.davherrmann.efficiently.view.Table;
 import de.davherrmann.immutable.Immutable;
@@ -88,14 +89,27 @@ public class MySpecialReducer implements Reducer<MySpecialState>
                 ? items
                 : items.addAll(PersonService.persons())));
 
+        // validation
+        reducers.add("validate/pageUserLogin.userFirstName", (state, action) -> state //
+            .in(path.pageUserLogin().userFirstName()::valid) //
+            .set(state.get(path.pageUserLogin().userFirstName()::value).length() % 2 == 0));
+        reducers.add("validate/pageUserLogin.userLastName", (state, action) -> {
+            final String currentValue = state.get(path.pageUserLogin().userLastName()::value);
+            final boolean isValid = currentValue.length() % 2 == 1;
+            return state //
+                .in(path.pageUserLogin().userLastName()::valid).set(isValid) //
+                .in(path.pageUserLogin().userLastName()::error).set(isValid
+                    ? ""
+                    : "Length must be an odd number!");
+        });
+
         // default action
         // TODO use this as default action?
         // TODO pass action as parameter as well!
         // TODO findFirst vs all?
         reducers.add(".*", (state, action) -> {
-            System.out.println("we have no reducer for action: " + action.type());
-            return state  //
-                .in(global.assistantProperties()::title).update(title -> title + "!");
+            System.out.println("NO REDUCER FOR: " + action.type());
+            return state;
         });
 
         // TODO allow state subset?
@@ -147,9 +161,11 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(path.pageUserLogin().userFirstName()::cols).set("2,3") //
             .in(path.pageUserLogin().userFirstName()::value).set("Test") //
             .in(path.pageUserLogin().userFirstName()::label).set("First Name") //
+            .in(path.pageUserLogin().userFirstName()::validateOn).set(Field.ValidateOn.BLUR) //
 
             .in(path.pageUserLogin().userLastName()::cols).set("2,3") //
             .in(path.pageUserLogin().userLastName()::label).set("Last Name") //
+            .in(path.pageUserLogin().userLastName()::validateOn).set(Field.ValidateOn.CHANGE) //
 
             .in(path.pageUserLogin().userEmail()::value).set("email@email.com") //
             .in(path.pageUserLogin().userEmail()::label).set("Email") //
