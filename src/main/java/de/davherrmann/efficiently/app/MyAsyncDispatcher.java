@@ -5,6 +5,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import javax.inject.Named;
 
+import com.google.common.collect.ImmutableMap;
+
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.AsyncDispatcher;
 import de.davherrmann.efficiently.server.Dispatcher;
@@ -31,7 +33,10 @@ public class MyAsyncDispatcher extends AsyncDispatcher
             execute(syncDispatcher, () -> {
                 // simulate long lasting service call
                 sleepUninterruptibly(2, SECONDS);
-                syncDispatcher.dispatch(new Action("assistantAction/reallyPrint"));
+                syncDispatcher.dispatch(
+                    new Action("assistantAction/reallyPrint", ImmutableMap.<String, String>builder() //
+                        .put("title", "No worries, we printed it out!") //
+                        .build()));
             });
         }
     }

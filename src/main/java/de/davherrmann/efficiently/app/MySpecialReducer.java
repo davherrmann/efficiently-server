@@ -73,7 +73,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
             .in(global.dialogProperties()::hidden).set(false));
         // TODO casting is not really safe here, could be any action
         reducers.add("assistantAction/reallyPrint", (state, action) -> state //
-            .in(global.assistantProperties()::title).set(action.meta().toString()));
+            .in(global.assistantProperties()::title).set(action.meta().get("title")));
 
         // dialog actions
         reducers.add("dialogAction/reallyClose", (state, action) -> state //
@@ -90,9 +90,12 @@ public class MySpecialReducer implements Reducer<MySpecialState>
                 : items.addAll(PersonService.persons())));
 
         // validation
-        reducers.add("validate/pageUserLogin.userFirstName", (state, action) -> state //
-            .in(path.pageUserLogin().userFirstName()::valid) //
-            .set(state.get(path.pageUserLogin().userFirstName()::value).length() % 2 == 0));
+        reducers.add("validate/pageUserLogin.userFirstName", (state, action) -> {
+            final String firstName = state.get(path.pageUserLogin().userFirstName()::value);
+            return state //
+                .in(path.pageUserLogin().userFirstName()::valid) //
+                .set(firstName == null || firstName.length() % 2 == 0);
+        });
         reducers.add("validate/pageUserLogin.userLastName", (state, action) -> {
             final String currentValue = state.get(path.pageUserLogin().userLastName()::value);
             final boolean isValid = currentValue.length() % 2 == 1;
