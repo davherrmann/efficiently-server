@@ -1,4 +1,4 @@
-package de.davherrmann.efficiently.view;
+package de.davherrmann.efficiently.components;
 
 // TODO when should I use Bindable, when should I add the props directly
 public interface Refresher extends Element, Bindable<Refresher, Refresher.RefresherProperties>

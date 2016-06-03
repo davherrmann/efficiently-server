@@ -1,4 +1,4 @@
-package de.davherrmann.efficiently.view;
+package de.davherrmann.efficiently.components;
 
 public interface View
 {

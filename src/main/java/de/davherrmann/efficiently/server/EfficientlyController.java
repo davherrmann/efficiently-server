@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.Gson;
 
 import de.davherrmann.efficiently.app.MySpecialState;
-import de.davherrmann.efficiently.view.View;
+import de.davherrmann.efficiently.components.View;
 import de.davherrmann.immutable.Immutable;
 
 @RestController

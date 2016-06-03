@@ -3,12 +3,12 @@ package de.davherrmann.efficiently.app;
 import java.util.List;
 import java.util.Map;
 
-import de.davherrmann.efficiently.view.Assistant.AssistantProperties;
-import de.davherrmann.efficiently.view.Dialog.DialogProperties;
-import de.davherrmann.efficiently.view.Field.FieldProperties;
-import de.davherrmann.efficiently.view.Refresher.RefresherProperties;
-import de.davherrmann.efficiently.view.States.PossibleState;
-import de.davherrmann.efficiently.view.Table.TableProperties;
+import de.davherrmann.efficiently.components.Assistant.AssistantProperties;
+import de.davherrmann.efficiently.components.Dialog.DialogProperties;
+import de.davherrmann.efficiently.components.Field.FieldProperties;
+import de.davherrmann.efficiently.components.Refresher.RefresherProperties;
+import de.davherrmann.efficiently.components.States.PossibleState;
+import de.davherrmann.efficiently.components.Table.TableProperties;
 
 public interface MySpecialState
 {

@@ -1,4 +1,4 @@
-package de.davherrmann.efficiently.view;
+package de.davherrmann.efficiently.components;
 
 import static com.google.common.base.Joiner.on;
 import static com.google.common.collect.Maps.newHashMap;

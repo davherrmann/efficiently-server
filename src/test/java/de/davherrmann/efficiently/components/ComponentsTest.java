@@ -1,7 +1,7 @@
-package de.davherrmann.efficiently.view;
+package de.davherrmann.efficiently.components;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static de.davherrmann.efficiently.view.ComponentsTest.TestElement.TESTELEMENT;
+import static de.davherrmann.efficiently.components.ComponentsTest.TestElement.TESTELEMENT;
 import static java.lang.String.format;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -16,7 +16,7 @@ import org.junit.rules.ExpectedException;
 
 import com.google.common.collect.ImmutableMap;
 
-import de.davherrmann.efficiently.view.ComponentsTest.TestElement.TestElementProperties;
+import de.davherrmann.efficiently.components.ComponentsTest.TestElement.TestElementProperties;
 import de.davherrmann.immutable.PathRecorder;
 
 public class ComponentsTest

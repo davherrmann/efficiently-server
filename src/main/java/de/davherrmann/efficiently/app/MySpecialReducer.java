@@ -14,10 +14,10 @@ import com.google.common.collect.ImmutableMap;
 import de.davherrmann.efficiently.server.Action;
 import de.davherrmann.efficiently.server.Reducer;
 import de.davherrmann.efficiently.server.Reducers;
-import de.davherrmann.efficiently.view.Dialog;
-import de.davherrmann.efficiently.view.Field;
-import de.davherrmann.efficiently.view.States.PossibleState;
-import de.davherrmann.efficiently.view.Table;
+import de.davherrmann.efficiently.components.Dialog;
+import de.davherrmann.efficiently.components.Field;
+import de.davherrmann.efficiently.components.States.PossibleState;
+import de.davherrmann.efficiently.components.Table;
 import de.davherrmann.immutable.Immutable;
 
 @Named

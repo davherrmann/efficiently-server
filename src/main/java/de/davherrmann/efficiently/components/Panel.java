@@ -1,6 +1,6 @@
-package de.davherrmann.efficiently.view;
+package de.davherrmann.efficiently.components;
 
-import de.davherrmann.efficiently.view.Element.ElementProperties;
+import de.davherrmann.efficiently.components.Element.ElementProperties;
 
 public interface Panel extends HasContent<Panel>, Bindable<Panel, ElementProperties>
 {
