@@ -44,6 +44,10 @@ public class MySpecialView implements View
         // TODO allow setting static props directly
         // .in(p -> p::validateOn).set(Field.ValidateOn.BLUR)
 
+        // TODO dynamic content? list of fields?
+        //create(DynamicList.class) //
+        //    .template((index))
+
         final MySpecialState.PageUserLoginState pageUserLogin = path.pageUserLogin();
 
         return create(PANEL) //
