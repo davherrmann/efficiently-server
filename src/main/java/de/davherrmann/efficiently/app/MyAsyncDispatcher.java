@@ -22,6 +22,8 @@ public class MyAsyncDispatcher extends AsyncDispatcher
     // -> async dispatcher dispatches ACTION_SET_FORM_VALUE("form_X.user.name", "Foo")
 
     // TODO api: return true if waiting for async action, return false if not? or dispatch: "waiting for async"?
+
+    // TODO pass state, so we can read it!
     @Override
     public void dispatch(final Dispatcher syncDispatcher, final Action action)
     {
