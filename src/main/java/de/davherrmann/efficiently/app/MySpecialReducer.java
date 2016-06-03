@@ -90,13 +90,13 @@ public class MySpecialReducer implements Reducer<MySpecialState>
                 : items.addAll(PersonService.persons())));
 
         // validation
-        reducers.add("validate/pageUserLogin.userFirstName", (state, action) -> {
+        reducers.add("validate/pageUserLogin.userFirstName.value", (state, action) -> {
             final String firstName = state.get(path.pageUserLogin().userFirstName()::value);
             return state //
                 .in(path.pageUserLogin().userFirstName()::valid) //
                 .set(firstName == null || firstName.length() % 2 == 0);
         });
-        reducers.add("validate/pageUserLogin.userLastName", (state, action) -> {
+        reducers.add("validate/pageUserLogin.userLastName.value", (state, action) -> {
             final String currentValue = state.get(path.pageUserLogin().userLastName()::value);
             final boolean isValid = currentValue.length() % 2 == 1;
             return state //
