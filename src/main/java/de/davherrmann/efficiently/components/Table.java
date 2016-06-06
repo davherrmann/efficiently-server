@@ -11,6 +11,8 @@ public interface Table extends Element, Bindable<Table, Table.TableProperties>
         String name();
 
         int width();
+
+        String renderer();
     }
 
     interface TableProperties extends Element.ElementProperties

@@ -11,13 +11,13 @@ import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
 
-import de.davherrmann.efficiently.server.Action;
-import de.davherrmann.efficiently.server.Reducer;
-import de.davherrmann.efficiently.server.Reducers;
 import de.davherrmann.efficiently.components.Dialog;
 import de.davherrmann.efficiently.components.Field;
 import de.davherrmann.efficiently.components.States.PossibleState;
 import de.davherrmann.efficiently.components.Table;
+import de.davherrmann.efficiently.server.Action;
+import de.davherrmann.efficiently.server.Reducer;
+import de.davherrmann.efficiently.server.Reducers;
 import de.davherrmann.immutable.Immutable;
 
 @Named
@@ -175,7 +175,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
             .in(path.pageUserList().tableProperties()::items).set(persons()) //
             .in(path.pageUserList().tableProperties()::columns).set(newArrayList( //
-                column("thumbnail", 100), //
+                column("thumbnail", 100, "imageByUrlRenderer"), //
                 column("firstname"), //
                 column("lastname"), //
                 column("email"))) //
@@ -193,6 +193,15 @@ public class MySpecialReducer implements Reducer<MySpecialState>
         return addCaptionsTo(initialState, "German");
     }
 
+    private Table.Column column(final String columnName, final int width, final String renderer)
+    {
+        return new Immutable<>(Table.Column.class) //
+            .in(p -> p::name).set(columnName) //
+            .in(p -> p::width).set(width) //
+            .in(p -> p::renderer).set(renderer) //
+            .asObject();
+    }
+
     @SuppressWarnings("unchecked")
     private List<Object> persons()
     {
@@ -206,10 +215,7 @@ public class MySpecialReducer implements Reducer<MySpecialState>
 
     private Table.Column column(String columnName, int width)
     {
-        return new Immutable<>(Table.Column.class) //
-            .in(p -> p::name).set(columnName) //
-            .in(p -> p::width).set(width) //
-            .asObject();
+        return column(columnName, width, "defaultRenderer");
     }
 
     private Dialog.Action dialogAction(final String type, final String name)
