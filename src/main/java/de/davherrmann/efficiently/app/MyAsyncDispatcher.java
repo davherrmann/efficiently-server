@@ -14,15 +14,6 @@ import de.davherrmann.efficiently.server.Dispatcher;
 @Named
 public class MyAsyncDispatcher extends AsyncDispatcher
 {
-    // TODO use async dispatcher to change input values via an explicit event?
-    // TODO question: why not change input value state in reducer?
-    // advantage: we know when to really set the value on client side
-    // can we achieve this with server and client side versioned state and a merge strategy?
-    // client dispatches ACTION_RESET
-    // -> async dispatcher dispatches ACTION_SET_FORM_VALUE("form_X.user.name", "Foo")
-
-    // TODO api: return true if waiting for async action, return false if not? or dispatch: "waiting for async"?
-
     // TODO pass state, so we can read it!
     @Override
     public void dispatch(final Dispatcher syncDispatcher, final Action action)
